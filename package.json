@@ -1,0 +1,41 @@
+{
+  "name": "cs-dashboard",
+  "version": "1.0.0",
+  "description": "It is cognitive solution dashboard",
+  "main": "app.js",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "start": "npm run build && node app",
+    "dev": "webpack-dev-server --open --hot"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xuchengli/cs-dashboard.git"
+  },
+  "keywords": [
+    "vue",
+    "vue-router",
+    "express",
+    "nodejs",
+    "webpack"
+  ],
+  "author": "lixucheng (lixucheng@aliyun.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xuchengli/cs-dashboard/issues"
+  },
+  "homepage": "https://github.com/xuchengli/cs-dashboard#readme",
+  "dependencies": {
+    "express": "^4.15.4"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^0.1.16",
+    "cross-env": "^5.0.5",
+    "file-loader": "^0.11.2",
+    "html-webpack-plugin": "^2.30.1",
+    "url-loader": "^0.5.9",
+    "webpack": "^3.5.6",
+    "webpack-dev-server": "^2.7.1",
+    "webpack-merge": "^4.1.0"
+  }
+}
