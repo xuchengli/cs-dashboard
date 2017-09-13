@@ -11,6 +11,11 @@ let config = {
         path: path.join(__dirname, "public"),
         filename: production ? "js/[name].[chunkhash].js" : "js/bundle.js"
     },
+    resolve: {
+        alias: {
+            "vue$": "vue/dist/vue.esm.js"
+        }
+    },
     module: {
         rules: [
             {
@@ -20,19 +25,28 @@ let config = {
                     name: "[hash:6].[ext]",
                     limit: 10000
                 }
+            },
+            {
+                test: /\.vue$/,
+                use: "vue-loader"
             }
         ]
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: "Cognitive Solution Dashboard"
+            template: "./index.html"
         })
     ]
 };
 if (production) {
     config = merge(config, {
         plugins: [
-            new CleanWebpackPlugin(["public"])
+            new CleanWebpackPlugin(["public"]),
+            new webpack.DefinePlugin({
+                "process.env": {
+                    NODE_ENV: '"production"'
+                }
+            })
         ]
     });
 } else {
