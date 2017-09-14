@@ -2,6 +2,7 @@ const webpack = require("webpack");
 const path = require("path");
 const merge = require("webpack-merge");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const production = process.env.NODE_ENV === "production";
 
@@ -18,6 +19,11 @@ let config = {
     },
     module: {
         rules: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: "babel-loader"
+            },
             {
                 test: /\.(png|jpg|gif|eot|svg|ttf|woff|woff2)$/,
                 loader: "url-loader",
@@ -40,11 +46,43 @@ let config = {
 };
 if (production) {
     config = merge(config, {
+        module: {
+            rules: [
+                {
+                    test: /\.css$/,
+                    use: ExtractTextPlugin.extract({
+                        use: {
+                            loader: "css-loader",
+                            options: {
+                                minimize: true
+                            }
+                        }
+                    })
+                }
+            ]
+        },
         plugins: [
-            new CleanWebpackPlugin(["public"]),
             new webpack.DefinePlugin({
                 "process.env": {
                     NODE_ENV: '"production"'
+                }
+            }),
+            new CleanWebpackPlugin(["public"]),
+            new ExtractTextPlugin("css/[name].[chunkhash].css"),
+            new webpack.HashedModuleIdsPlugin(),
+            new webpack.optimize.CommonsChunkPlugin({
+                name: "vendor",
+                minChunks: function (module) {
+                    return module.context && module.context.indexOf("node_modules") !== -1;
+                }
+            }),
+            new webpack.optimize.CommonsChunkPlugin({
+                name: "runtime"
+            }),
+            new webpack.optimize.UglifyJsPlugin({
+                comments: false,
+                compress: {
+                    warnings: false
                 }
             })
         ]
@@ -53,6 +91,14 @@ if (production) {
     config = merge(config, {
         devServer: {
             contentBase: "./public"
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.css$/,
+                    use: ["style-loader", "css-loader"]
+                }
+            ]
         }
     });
 }
