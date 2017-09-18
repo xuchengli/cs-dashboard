@@ -12,6 +12,11 @@
                             :class="userIdClass" v-model="userId"
                             @focus="userIdActive = true" @blur="userIdActive = false">
                     </div>
+                    <transition name="slide-fade">
+                        <warning v-if="userIdWarning">
+                            Please input use id.
+                        </warning>
+                    </transition>
                 </div>
                 <div class="uk-margin">
                     <div class="uk-inline uk-width-1-1">
@@ -20,6 +25,11 @@
                             :class="passwordClass" v-model="password"
                             @focus="passwordActive = true" @blur="passwordActive = false">
                     </div>
+                    <transition name="slide-fade">
+                        <warning v-if="passwordWarning">
+                            Please input password.
+                        </warning>
+                    </transition>
                 </div>
                 <div class="uk-margin uk-margin-remove-bottom">
                     <label>
@@ -36,6 +46,8 @@
     </div>
 </template>
 <script>
+    import warning from "../../components/warning.vue";
+
     export default {
         data() {
             return {
@@ -47,17 +59,37 @@
             }
         },
         computed: {
+            userIdWarning() {
+                return !this.userIdActive && this.userId === "";
+            },
             userIdClass() {
-                return this.userIdActive ? "" : this.userId === "" ? "uk-form-danger" : "";
+                return this.userIdWarning ? "uk-form-danger" : "";
+            },
+            passwordWarning() {
+                return !this.passwordActive && this.password === "";
             },
             passwordClass() {
-                return this.passwordActive ? "" : this.password === "" ? "uk-form-danger" : "";
+                return this.passwordWarning ? "uk-form-danger" : "";
             }
         },
         methods: {
             login() {
-                console.log(this.userId, this.password, this.checked);
+                if (this.userId != "" && this.password != "") {
+
+                }
             }
+        },
+        components: {
+            warning
         }
     }
 </script>
+<style scoped>
+    .slide-fade-enter, .slide-fade-leave-to {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    .slide-fade-enter-active, .slide-fade-leave-active {
+        transition: transform .5s, opacity .5s;
+    }
+</style>
