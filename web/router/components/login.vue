@@ -6,30 +6,16 @@
         <div class="uk-card-body">
             <form>
                 <div class="uk-margin">
-                    <div class="uk-inline uk-width-1-1">
-                        <span class="uk-form-icon" uk-icon="icon: user"></span>
-                        <input class="uk-input" type="text" placeholder="User ID"
-                            :class="userIdClass" v-model="userId"
-                            @focus="userIdActive = true" @blur="userIdActive = false">
-                    </div>
-                    <transition name="slide-fade">
-                        <warning v-if="userIdWarning">
-                            Please input use id.
-                        </warning>
-                    </transition>
+                    <verifiable-input class="uk-width-1-1"
+                        icon="user" placeholder="User ID" v-model="userId"
+                        empty-message="Please input use id.">
+                    </verifiable-input>
                 </div>
                 <div class="uk-margin">
-                    <div class="uk-inline uk-width-1-1">
-                        <span class="uk-form-icon" uk-icon="icon: lock"></span>
-                        <input class="uk-input" type="password" placeholder="Password"
-                            :class="passwordClass" v-model="password"
-                            @focus="passwordActive = true" @blur="passwordActive = false">
-                    </div>
-                    <transition name="slide-fade">
-                        <warning v-if="passwordWarning">
-                            Please input password.
-                        </warning>
-                    </transition>
+                    <verifiable-input class="uk-width-1-1"
+                        icon="lock" type="password" placeholder="Password" v-model="password"
+                        empty-message="Please input password.">
+                    </verifiable-input>
                 </div>
                 <div class="uk-margin uk-margin-remove-bottom">
                     <label>
@@ -46,50 +32,28 @@
     </div>
 </template>
 <script>
-    import warning from "../../components/warning.vue";
+    import VerifiableInput from "../../components/verifiable-input.vue";
 
     export default {
         data() {
             return {
                 userId: "",
                 password: "",
-                checked: false,
-                userIdActive: true,
-                passwordActive: true
+                checked: false
             }
         },
         computed: {
-            userIdWarning() {
-                return !this.userIdActive && this.userId === "";
-            },
-            userIdClass() {
-                return this.userIdWarning ? "uk-form-danger" : "";
-            },
-            passwordWarning() {
-                return !this.passwordActive && this.password === "";
-            },
-            passwordClass() {
-                return this.passwordWarning ? "uk-form-danger" : "";
-            }
         },
         methods: {
             login() {
+                console.log(this.userId, this.password);
                 if (this.userId != "" && this.password != "") {
 
                 }
             }
         },
         components: {
-            warning
+            VerifiableInput
         }
     }
 </script>
-<style scoped>
-    .slide-fade-enter, .slide-fade-leave-to {
-        transform: translateY(-50px);
-        opacity: 0;
-    }
-    .slide-fade-enter-active, .slide-fade-leave-active {
-        transition: transform .5s, opacity .5s;
-    }
-</style>
