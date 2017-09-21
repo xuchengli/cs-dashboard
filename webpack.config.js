@@ -73,11 +73,17 @@ if (production) {
             new webpack.optimize.CommonsChunkPlugin({
                 name: "vendor",
                 minChunks: function (module) {
-                    return module.context && module.context.indexOf("node_modules") !== -1;
+                    if (module.context && module.context.indexOf("node_modules") !== -1) {
+                        if (module.resource && (/jquery|uikit/).test(module.resource) &&
+                            !(/\.css$/).test(module.resource)) {
+                            return true;
+                        }
+                    }
+                    return false;
                 }
             }),
             new webpack.optimize.CommonsChunkPlugin({
-                name: "runtime"
+                name: "manifest"
             }),
             new webpack.optimize.UglifyJsPlugin({
                 comments: false,
