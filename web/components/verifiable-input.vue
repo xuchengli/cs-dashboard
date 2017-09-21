@@ -3,10 +3,10 @@
         <span class="uk-form-icon" :uk-icon="'icon: ' + icon"></span>
         <input :type="type" class="uk-input" :class="clz" :placeholder="placeholder"
             :value="value" @input="updateValue($event.target.value)"
-            @focus="active = true; show = true;" @blur="active = false;">
+            @focus="focus" @blur="blur">
         <transition name="slide-fade" @after-enter="afterEnter" @before-leave="beforeLeave">
-            <div class="warning" :style="style" v-if="warning && show">
-                <span class="uk-text-nowrap">{{ emptyMessage }}</span>
+            <div class="tooltip" :style="style" v-if="message != ''">
+                <span class="uk-text-nowrap">{{ message }}</span>
             </div>
         </transition>
     </div>
@@ -24,36 +24,52 @@
             },
             value: String,
             placeholder: String,
-            emptyMessage: String
+            status: {
+                type: String,
+                default: "normal"
+            },
+            message: {
+                type: String,
+                default: ""
+            }
         },
         data() {
             return {
                 left: 0,
-                active: true,
-                timer: null,
-                show: true
+                timer: null
             }
         },
         computed: {
-            warning() {
-                return !this.active && this.value === "";
-            },
             clz() {
-                return this.warning ? "uk-form-danger" : "";
+                return this.status != "normal" ? "uk-form-danger" : "";
             },
             style() {
+                let color = "#000";
+                if (this.status === "warning") {
+                    color = "#faa05a";
+                } else if (this.status === "error") {
+                    color = "#f0506e";
+                }
                 return {
-                    left: this.left + "px"
+                    left: this.left + "px",
+                    background: color
                 }
             }
         },
         methods: {
+            focus() {
+                this.$emit("update:status", "normal");
+                this.$emit("update:message", "");
+            },
+            blur() {
+                this.$emit("blur");
+            },
             updateValue(value) {
                 this.$emit("input", value);
             },
             afterEnter(el) {
                 if (!this.timer) {
-                    this.timer = setTimeout(() => this.show = false, 1000);
+                    this.timer = setTimeout(() => this.$emit("update:message", ""), 1000);
                 }
             },
             beforeLeave(el) {
@@ -70,13 +86,12 @@
     }
 </script>
 <style scoped>
-    .warning {
+    .tooltip {
         position: absolute;
         top: 8px;
         z-index: 1000;
         box-sizing: border-box;
         padding: 3px 6px;
-        background: #faa05a;
         border-radius: 2px;
         color: #fff;
         font-size: 12px;

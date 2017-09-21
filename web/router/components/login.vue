@@ -7,14 +7,16 @@
             <form>
                 <div class="uk-margin">
                     <verifiable-input class="uk-width-1-1"
-                        icon="user" placeholder="User ID" v-model="userId"
-                        empty-message="Please input use id.">
+                        icon="user" placeholder="User ID" v-model="userId.value"
+                        :status.sync="userId.status" :message.sync="userId.message"
+                        @blur="validateUserId">
                     </verifiable-input>
                 </div>
                 <div class="uk-margin">
                     <verifiable-input class="uk-width-1-1"
-                        icon="lock" type="password" placeholder="Password" v-model="password"
-                        empty-message="Please input password.">
+                        icon="lock" type="password" placeholder="Password" v-model="password.value"
+                        :status.sync="password.status" :message.sync="password.message"
+                        @blur="validatePassword">
                     </verifiable-input>
                 </div>
                 <div class="uk-margin uk-margin-remove-bottom">
@@ -37,18 +39,39 @@
     export default {
         data() {
             return {
-                userId: "",
-                password: "",
+                userId: {
+                    value: "",
+                    status: "normal",
+                    message: ""
+                },
+                password: {
+                    value: "",
+                    status: "normal",
+                    message: ""
+                },
                 checked: false
             }
         },
-        computed: {
-        },
         methods: {
+            validateUserId() {
+                if (this.userId.value === "") {
+                    this.userId.status = "warning";
+                    this.userId.message = "Please input use id.";
+                    return false;
+                }
+                return true;
+            },
+            validatePassword() {
+                if (this.password.value === "") {
+                    this.password.status = "warning";
+                    this.password.message = "Please input password.";
+                    return false;
+                }
+                return true;
+            },
             login() {
-                console.log(this.userId, this.password);
-                if (this.userId != "" && this.password != "") {
-
+                if (this.validateUserId() && this.validatePassword()) {
+                    console.log(this.userId.value, this.password.value);
                 }
             }
         },
