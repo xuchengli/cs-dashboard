@@ -10,19 +10,14 @@ router.post("/register", (req, res) => {
         let user = new User();
         let isExist = yield user.isExist(userId);
         if (isExist) {
-            res.json({
-                success: false,
-                code: 0,
-                message: "User ID is exist."
-            });
+            res.sendStatus(409);
         } else {
             let userInfo = yield user.register(userId, password);
-            let resp = { success: true };
-            res.json(Object.assign(resp, userInfo));
+            res.json(userInfo);
         }
     }).catch(err => {
-        let resp = { success: false };
-        res.json(Object.assign(resp, err));
+        console.error(err);
+        res.status(500).send(err);
     });
 });
 module.exports = router;

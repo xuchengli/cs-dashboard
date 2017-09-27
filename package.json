@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/xuchengli/cs-dashboard#readme",
   "dependencies": {
+    "axios": "^0.16.2",
     "body-parser": "^1.18.2",
     "co": "^4.6.0",
     "cookie-parser": "^1.4.3",

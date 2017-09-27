@@ -41,6 +41,8 @@
     </div>
 </template>
 <script>
+    import UIkit from "uikit";
+    import axios from "axios";
     import VerifiableInput from "../../components/verifiable-input.vue";
 
     export default {
@@ -72,29 +74,52 @@
                 }
                 return true;
             },
+            confirm(pwd1, pwd2) {
+                if (pwd1.value != "" && pwd2.value != "" && pwd1.value != pwd2.value) {
+                    pwd1.status = "warning";
+                    pwd1.message = "Please confirm password.";
+                    pwd2.status = "normal";
+                    pwd2.message = "";
+                    return false;
+                } else {
+                    pwd1.status = "normal";
+                    pwd1.message = "";
+                    pwd2.status = "normal";
+                    pwd2.message = "";
+                    return true;
+                }
+            },
             validatePassword() {
                 if (this.password.value === "") {
                     this.password.status = "warning";
                     this.password.message = "Please input password.";
                     return false;
                 }
-                return true;
+                return this.confirm(this.password, this.retypePassword);
             },
             validateRetypePassword() {
                 if (this.retypePassword.value === "") {
                     this.retypePassword.status = "warning";
                     this.retypePassword.message = "Please retype password.";
                     return false;
-                } else if (this.retypePassword.value != this.password.value) {
-                    this.retypePassword.status = "warning";
-                    this.retypePassword.message = "Please confirm password.";
-                    return false;
                 }
-                return true;
+                return this.confirm(this.retypePassword, this.password);
             },
             register() {
                 if (this.validateUserId() && this.validatePassword() && this.validateRetypePassword()) {
-                    console.log(this.userId.value, this.password.value);
+                    axios.post("api/register", {
+                        userId: this.userId.value,
+                        password: this.password.value
+                    }).then(res => {
+                        console.log(res.data);
+                    }).catch(err => {
+                        if (err.response.status === 409) {
+                            this.userId.status = "error";
+                            this.userId.message = "User ID is exist.";
+                        } else if (err.response.status === 500) {
+                            UIkit.notification("Internal Server Error", "danger");
+                        }
+                    });
                 }
             }
         },
