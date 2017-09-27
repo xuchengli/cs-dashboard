@@ -33,10 +33,6 @@ let config = {
                     name: "[hash:6].[ext]",
                     limit: 10000
                 }
-            },
-            {
-                test: /\.vue$/,
-                use: "vue-loader"
             }
         ]
     },
@@ -61,6 +57,13 @@ if (production) {
                             }
                         }
                     })
+                },
+                {
+                    test: /\.vue$/,
+                    loader: "vue-loader",
+                    options: {
+                        extractCSS: true
+                    }
                 }
             ]
         },
@@ -76,13 +79,7 @@ if (production) {
             new webpack.optimize.CommonsChunkPlugin({
                 name: "vendor",
                 minChunks: function (module) {
-                    if (module.context && module.context.indexOf("node_modules") !== -1) {
-                        if (module.resource && (/jquery|uikit/).test(module.resource) &&
-                            !(/\.css$/).test(module.resource)) {
-                            return true;
-                        }
-                    }
-                    return false;
+                    return module.context && module.context.indexOf("node_modules") !== -1;
                 }
             }),
             new webpack.optimize.CommonsChunkPlugin({
@@ -106,6 +103,10 @@ if (production) {
                 {
                     test: /\.css$/,
                     use: ["style-loader", "css-loader"]
+                },
+                {
+                    test: /\.vue$/,
+                    use: "vue-loader"
                 }
             ]
         },
