@@ -7,7 +7,9 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const production = process.env.NODE_ENV === "production";
 
 let config = {
-    entry: "./web/js/index.js",
+    entry: production ?
+            ["./web/js/index.js"] :
+            ["webpack-hot-middleware/client?reload=true", "./web/js/index.js"],
     output: {
         path: path.join(__dirname, "public"),
         filename: production ? "js/[name].[chunkhash].js" : "js/bundle.js"
@@ -40,7 +42,8 @@ let config = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: "./index.html"
+            template: "./index.ejs",
+            env: process.env.NODE_ENV
         })
     ]
 };
@@ -95,8 +98,8 @@ if (production) {
     });
 } else {
     config = merge(config, {
-        devServer: {
-            contentBase: "./public"
+        output: {
+            publicPath: require("./modules/configuration").Context_Path
         },
         module: {
             rules: [
@@ -105,7 +108,11 @@ if (production) {
                     use: ["style-loader", "css-loader"]
                 }
             ]
-        }
+        },
+        plugins: [
+            new webpack.HotModuleReplacementPlugin(),
+            new webpack.NoEmitOnErrorsPlugin()
+        ]
     });
 }
 module.exports = config;
