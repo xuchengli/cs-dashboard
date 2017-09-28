@@ -3,7 +3,7 @@
         <span class="uk-form-icon" :uk-icon="'icon: ' + icon"></span>
         <input :type="type" class="uk-input" :class="clz" :placeholder="placeholder"
             :value="value" @input="updateValue($event.target.value)"
-            @focus="focus" @blur="blur">
+            @focus="focus" @blur="blur" :disabled="disabled">
         <transition name="slide-fade" @after-enter="afterEnter" @before-leave="beforeLeave">
             <div class="tooltip" :style="style" v-if="message != ''">
                 <span class="uk-text-nowrap">{{ message }}</span>
@@ -24,6 +24,10 @@
             },
             value: String,
             placeholder: String,
+            disabled: {
+                type: Boolean,
+                default: false
+            },
             status: {
                 type: String,
                 default: "normal"
