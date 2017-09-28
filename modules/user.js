@@ -1,32 +1,33 @@
-const mongoose = require("mongoose");
-mongoose.Promise = global.Promise;
-const Schema = mongoose.Schema;
-
-const userSchema = new Schema({
-    user_id: { type: String, unique: true },
-    password: { type: String, required: true }
-});
-const User = mongoose.model("User", userSchema);
+const axios = require("axios");
+const https = require("https");
+const uuid = require("uuid/v1");
+const config = require("./configuration");
+const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
 class user {
-    isExist(userId) {
+    account(apikey) {
         return new Promise((resolve, reject) => {
-            User.count({ user_id: userId }, (err, count) => {
-                if (err) reject(err);
-                resolve(count > 0);
-            });
+            axios("user/account/apikey/" + apikey, {
+                baseURL: config.SV_BaseURL,
+                httpsAgent: httpsAgent
+            }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
     register(userId, password) {
         return new Promise((resolve, reject) => {
-            let user = new User({
-                user_id: userId,
-                password: password
-            });
-            user.save((err, userInfo) => {
-                if (err) reject(err);
-                resolve({ user_id: userInfo.user_id });
-            });
+            let apikey = uuid();
+            axios.post("user/account", {
+                username: userId,
+                passwd: password,
+                apikey: apikey
+            }, {
+                baseURL: config.SV_BaseURL,
+                httpsAgent: httpsAgent
+            }).then(res => {
+                resolve(Object.assign(res.data, {
+                    apikey: apikey
+                }));
+            }).catch(err => reject(err));
         });
     }
 }

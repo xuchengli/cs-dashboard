@@ -8,12 +8,15 @@ router.post("/register", (req, res) => {
         let userId = req.body.userId;
         let password = req.body.password;
         let user = new User();
-        let isExist = yield user.isExist(userId);
-        if (isExist) {
+        let registration = yield user.register(userId, password);
+        if (registration.success) {
+            let apikey = registration.apikey;
+            let account = yield user.account(apikey);
+            res.json(account);
+        } else if (registration.code === 2001) {
             res.sendStatus(409);
         } else {
-            let userInfo = yield user.register(userId, password);
-            res.json(userInfo);
+            throw new Error(registration.description);
         }
     }).catch(err => {
         console.error(err);

@@ -125,7 +125,7 @@
                         this.loading = false;
                         if (err.response.status === 409) {
                             this.userId.status = "error";
-                            this.userId.message = "User ID is exist.";
+                            this.userId.message = "User ID already registered.";
                         } else if (err.response.status === 500) {
                             UIkit.notification("Internal Server Error", "danger");
                         }

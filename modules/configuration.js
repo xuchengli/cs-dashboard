@@ -1,4 +1,5 @@
 module.exports = {
+    SV_BaseURL: process.env.SV_BaseURL || "https://ptopenlab.com/cloudlab/api/",
     mongodb: {
         //if need to auth, the URI of env is:
         //mongodb://admin:passw0rd@localhost:27017/cognitive_solution?authMechanism=DEFAULT
