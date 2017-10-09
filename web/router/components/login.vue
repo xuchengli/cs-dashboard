@@ -1,20 +1,35 @@
+<i18n>
+    {
+        "en": {
+            "title": "Login",
+            "userIdPlaceholder": "User ID",
+            "passwordPlaceholder": "Password"
+        },
+        "zh-CN": {
+            "title": "登录",
+            "userIdPlaceholder": "用户ID",
+            "passwordPlaceholder": "密码"
+        }
+    }
+</i18n>
 <template>
     <div class="uk-card uk-card-default uk-width-large uk-align-center uk-margin-auto-vertical">
         <div class="uk-card-header">
-            <h3 class="uk-card-title">Login</h3>
+            <h3 class="uk-card-title">{{ $t("title") }}</h3>
         </div>
         <div class="uk-card-body">
             <form>
                 <div class="uk-margin">
                     <verifiable-input class="uk-width-1-1"
-                        icon="user" placeholder="User ID" v-model="userId.value"
+                        icon="user" :placeholder="$t('userIdPlaceholder')" v-model="userId.value"
                         :status.sync="userId.status" :message.sync="userId.message"
                         :disabled="loading" @blur="validateUserId">
                     </verifiable-input>
                 </div>
                 <div class="uk-margin">
                     <verifiable-input class="uk-width-1-1"
-                        icon="lock" type="password" placeholder="Password" v-model="password.value"
+                        icon="lock" type="password"
+                        :placeholder="$t('passwordPlaceholder')" v-model="password.value"
                         :status.sync="password.status" :message.sync="password.message"
                         :disabled="loading" @blur="validatePassword">
                     </verifiable-input>

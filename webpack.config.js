@@ -62,7 +62,10 @@ if (production) {
                     test: /\.vue$/,
                     loader: "vue-loader",
                     options: {
-                        extractCSS: true
+                        extractCSS: true,
+                        loaders: {
+                            i18n: "@kazupon/vue-i18n-loader"
+                        }
                     }
                 }
             ]
@@ -106,7 +109,12 @@ if (production) {
                 },
                 {
                     test: /\.vue$/,
-                    use: "vue-loader"
+                    loader: "vue-loader",
+                    options: {
+                        loaders: {
+                            i18n: "@kazupon/vue-i18n-loader"
+                        }
+                    }
                 }
             ]
         },
