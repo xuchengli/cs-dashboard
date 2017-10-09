@@ -30,5 +30,16 @@ class user {
             }).catch(err => reject(err));
         });
     }
+    validate(userId, password) {
+        return new Promise((resolve, reject) => {
+            axios.post("user/account/validate", {
+                username: userId,
+                passwd: password
+            }, {
+                baseURL: config.SV_BaseURL,
+                httpsAgent: httpsAgent
+            }).then(res => resolve(res.data)).catch(err => reject(err));
+        });
+    }
 }
 module.exports = user;

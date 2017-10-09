@@ -1,4 +1,5 @@
 module.exports = {
+    cookieName: "csda", //Cognitive Solution Dashboard Account
     SV_BaseURL: process.env.SV_BaseURL || "https://ptopenlab.com/cloudlab/api/",
     mongodb: {
         //if need to auth, the URI of env is:
