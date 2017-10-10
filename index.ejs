@@ -8,6 +8,7 @@
         <div id="app" class="uk-container uk-margin-top uk-margin-bottom uk-flex"
             uk-height-viewport="expand: true">
             <router-view></router-view>
+            <locale-select :locale.sync="locale"></locale-select>
         </div>
         <% if (htmlWebpackPlugin.options.env === "development") { %>
             <script type="text/javascript" src="/reload/reload.js"></script>

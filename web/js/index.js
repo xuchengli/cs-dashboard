@@ -4,31 +4,35 @@ import VueI18n from "vue-i18n";
 import UIkit from "uikit";
 import Icons from "uikit/dist/js/uikit-icons";
 import router from "../router";
+import LocaleSelect from "../components/locale-select.vue";
 
 UIkit.use(Icons);
 Vue.use(VueI18n);
+Vue.component("locale-select", LocaleSelect);
 
-const i18n = new VueI18n({
-    locale: "zh-CN",
-    silentTranslationWarn: true,
-    messages: {
-        "en": {
-            "global": {
-                "error": {
-                    "500": "Internal Server Error."
+new Vue({
+    router,
+    data: {
+        locale: "zh-CN"
+    },
+    i18n: new VueI18n({
+        locale: "zh-CN",
+        silentTranslationWarn: true,
+        messages: {
+            "en": {
+                "global": {
+                    "error": {
+                        "500": "Internal Server Error."
+                    }
                 }
-            }
-        },
-        "zh-CN": {
-            "global": {
-                "error": {
-                    "500": "服务器异常，请稍后再试！"
+            },
+            "zh-CN": {
+                "global": {
+                    "error": {
+                        "500": "服务器异常，请稍后再试！"
+                    }
                 }
             }
         }
-    }
-});
-new Vue({
-    i18n,
-    router
+    })
 }).$mount("#app");
