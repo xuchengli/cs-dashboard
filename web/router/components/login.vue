@@ -25,7 +25,7 @@
     }
 </i18n>
 <template>
-    <div class="uk-card uk-card-default uk-width-large uk-align-center uk-margin-auto-vertical">
+    <div class="uk-card uk-card-default uk-width-large uk-margin-auto uk-margin-auto-vertical">
         <div class="uk-card-header">
             <h3 class="uk-card-title">{{ $t("title") }}</h3>
         </div>
@@ -117,7 +117,7 @@
                         rememberme: this.rememberme
                     }).then(res => {
                         this.loading = false;
-                        console.log(res.data);
+                        this.$router.push("dashboard");
                     }).catch(err => {
                         this.loading = false;
                         if (err.response.status === 403) {
