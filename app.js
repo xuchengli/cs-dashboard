@@ -7,8 +7,7 @@ const config = require("./modules/configuration");
 const app = express();
 const env = process.env.NODE_ENV || "production";
 
-//signed cookie
-app.use(cookieParser("cognitive solution dashboard"));
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

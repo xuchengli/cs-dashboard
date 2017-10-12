@@ -13,7 +13,7 @@ router.post("/register", (req, res) => {
         if (registration.success) {
             let apikey = registration.apikey;
             let account = yield user.account(apikey);
-            res.cookie(config.cookieName, account, { signed: true });
+            res.cookie(config.cookieName, JSON.stringify(account));
             res.json(account);
         } else if (registration.code === 2001) {
             res.sendStatus(409);
@@ -36,12 +36,11 @@ router.post("/login", (req, res) => {
             let apikey = validation.description;
             let account = yield user.account(apikey);
             if (rememberme) {
-                res.cookie(config.cookieName, account, {
-                    maxAge: 365 * 24 * 60 * 60 * 1000,
-                    signed: true
+                res.cookie(config.cookieName, JSON.stringify(account), {
+                    maxAge: 365 * 24 * 60 * 60 * 1000
                 });
             } else {
-                res.cookie(config.cookieName, account, { signed: true });
+                res.cookie(config.cookieName, JSON.stringify(account));
             }
             res.json(account);
         } else if (validation.code === 2003) {
