@@ -117,7 +117,7 @@
                         rememberme: this.rememberme
                     }).then(res => {
                         this.loading = false;
-                        this.$router.push("dashboard");
+                        this.$router.push("/videos");
                     }).catch(err => {
                         this.loading = false;
                         if (err.response.status === 403) {
