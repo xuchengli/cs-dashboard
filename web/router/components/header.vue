@@ -11,7 +11,7 @@
     }
 </i18n>
 <template>
-    <nav class="uk-navbar-container uk-margin" uk-navbar>
+    <nav class="uk-navbar-container uk-margin uk-margin-remove-top" uk-navbar>
         <div class="uk-navbar-left">
             <div class="uk-navbar-item">
                 <span class="uk-text-large">{{ $t("title") }}</span>
