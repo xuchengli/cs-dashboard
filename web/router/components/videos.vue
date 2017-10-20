@@ -1,7 +1,6 @@
 <i18n>
     {
         "en": {
-            "play": "Play",
             "edit": "Edit",
             "delete": "Delete",
             "upload": "Upload",
@@ -10,7 +9,6 @@
             "upload-fail-msg": "Upload failed."
         },
         "zh-CN": {
-            "play": "播放",
             "edit": "编辑",
             "delete": "删除",
             "upload": "上传",
@@ -31,14 +29,12 @@
             <div class="uk-flex uk-flex-wrap uk-flex-wrap-top uk-width-1-1"
                 uk-height-viewport="offset-top: true; offset-bottom: true" v-if="totalRow">
                 <div class="uk-box-shadow-small uk-box-shadow-hover-large
-                    uk-margin-left uk-margin-bottom uk-inline video"
+                    uk-margin-left uk-margin-bottom uk-inline"
                     v-for="video of currentPage"
                     @mouseenter="video.overlay = true;" @mouseleave="video.overlay = false;">
-                    <img :src="video.cover">
+                    <img :src="video.cover" class="video">
                     <div class="uk-position-center" v-if="video.overlay">
-                        <a class="uk-icon-button" uk-icon="icon: play"
-                            :class="{ 'uk-disabled': uploading }" uk-tooltip :title="$t('play')"></a>
-                        <a class="uk-icon-button uk-margin-small-left" uk-icon="icon: pencil"
+                        <a class="uk-icon-button" uk-icon="icon: pencil"
                             :class="{ 'uk-disabled': uploading }" uk-tooltip :title="$t('edit')"></a>
                         <a class="uk-icon-button uk-margin-small-left" uk-icon="icon: trash"
                             :class="{ 'uk-disabled': uploading }" uk-tooltip :title="$t('delete')"></a>
@@ -109,20 +105,6 @@
             getVideos() {
                 this.loading = true;
                 setTimeout(() => {
-                    for (let i=0; i<7; i++) {
-                        this.videos.push({
-                            cover: "https://getuikit.com/docs/images/photo.jpg",
-                            overlay: false
-                        });
-                        this.videos.push({
-                            cover: "https://getuikit.com/docs/images/dark.jpg",
-                            overlay: false
-                        });
-                        this.videos.push({
-                            cover: "https://getuikit.com/docs/images/light.jpg",
-                            overlay: false
-                        });
-                    }
                     this.loading = false;
                     this.$nextTick(() => {
                         UIkit.upload("#uploader", {
@@ -144,15 +126,21 @@
                             },
                             completeAll: e => {
                                 this.uploading = false;
+                                this.uploadedPercentage = 100;
                                 if (e.status === 200) {
                                     let response = e.responseJSON;
-                                    console.log(response);
+                                    this.videos.unshift({
+                                        id: response._id,
+                                        cover: "video/" + response._id + "/cover",
+                                        overlay: false
+                                    });
                                 } else {
                                     UIkit.notification(this.$t("upload-fail-msg"), "danger");
                                 }
                             },
                             error: e => {
                                 this.uploading = false;
+                                this.uploadedPercentage = 100;
                                 UIkit.notification(this.$t("upload-fail-msg"), "danger");
                             }
                         });

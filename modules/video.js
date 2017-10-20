@@ -32,6 +32,14 @@ class video {
             }).run();
         });
     }
+    findById(id) {
+        return new Promise((resolve, reject) => {
+            Video.findById(id, (err, video) => {
+                if (err) reject(err);
+                resolve(video);
+            });
+        });
+    }
     save(file) {
         return new Promise((resolve, reject) => {
             let video = new Video({

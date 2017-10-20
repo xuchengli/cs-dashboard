@@ -40,4 +40,14 @@ router.post("/upload", upload, (req, res) => {
         res.status(500).send(err);
     });
 });
+router.get("/:id/cover", (req, res) => {
+    co(function* () {
+        let video = new Video();
+        let file = yield video.findById(req.params.id);
+        res.sendFile(file.cover, { root: file.destination });
+    }).catch(err => {
+        console.error(err);
+        res.status(500).send(err);
+    });
+});
 module.exports = router;
