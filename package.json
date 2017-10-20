@@ -32,6 +32,7 @@
     "cookie-parser": "^1.4.3",
     "dateformat": "^3.0.2",
     "express": "^4.15.4",
+    "fluent-ffmpeg": "^2.1.2",
     "jquery": "^3.2.1",
     "mkdirp": "^0.5.1",
     "mongoose": "^4.12.3",

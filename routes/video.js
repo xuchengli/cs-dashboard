@@ -23,6 +23,16 @@ const upload = multer({ storage: storage }).single("video");
 router.post("/upload", upload, (req, res) => {
     co(function* () {
         let video = new Video();
+        let destination = req.file.destination;
+        let filename = req.file.filename;
+        let cover = filename.substring(0, filename.lastIndexOf(".")) + ".png";
+
+        let input = path.join(destination, filename);
+        let output = path.join(destination, cover);
+        let slice = yield video.timeSlice(input, output, 0);
+        if (slice) {
+            Object.assign(req.file, { cover: cover });
+        }
         let saved = yield video.save(req.file);
         res.json(saved);
     }).catch(err => {
