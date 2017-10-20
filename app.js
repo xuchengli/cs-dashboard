@@ -11,7 +11,13 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect(config.mongodb.uri, { useMongoClient: true });
+mongoose.connect(config.mongodb.uri, {
+    useMongoClient: true,
+    bufferMaxEntries: 0
+}, err => {
+    if (err) console.error(err);
+});
+mongoose.Promise = global.Promise;
 
 if (env == "development") {
     const webpack = require("webpack");

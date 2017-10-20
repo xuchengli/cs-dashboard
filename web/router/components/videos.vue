@@ -80,6 +80,7 @@
                 videos: [],
                 maxRowOnPage: 18,
                 pageNo: 1,
+                uploading: false,
                 uploadedPercentage: 0
             }
         },
@@ -96,9 +97,6 @@
                 let from = (this.pageNo - 1) * this.maxRowOnPage;
                 let to = Math.min(this.pageNo * this.maxRowOnPage, this.totalRow);
                 return this.videos.slice(from, to);
-            },
-            uploading() {
-                return this.uploadedPercentage > 0 && this.uploadedPercentage < 100;
             }
         },
         created() {
@@ -128,14 +126,15 @@
                     this.loading = false;
                     this.$nextTick(() => {
                         UIkit.upload("#uploader", {
-                            url: "upload",
+                            url: "video/upload",
                             name: "video",
                             mime: "video/*",
                             dataType: "json",
                             fail: e => {
                                 UIkit.notification(this.$t("invalid-mime-msg"), "warning");
                             },
-                            beforeAll: e => {
+                            loadStart: e => {
+                                this.uploading = true;
                                 this.uploadedPercentage = 0;
                             },
                             progress: e => {
@@ -144,8 +143,16 @@
                                 }
                             },
                             completeAll: e => {
+                                this.uploading = false;
+                                if (e.status === 200) {
+                                    let response = e.responseJSON;
+                                    console.log(response);
+                                } else {
+                                    UIkit.notification(this.$t("upload-fail-msg"), "danger");
+                                }
                             },
                             error: e => {
+                                this.uploading = false;
                                 UIkit.notification(this.$t("upload-fail-msg"), "danger");
                             }
                         });
