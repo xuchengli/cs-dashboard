@@ -19,7 +19,8 @@ const videoSchema = new Schema({
         no: Number,
         timepoint: String,
         filename: String
-    }]
+    }],
+    timestamp: { type: Date, default: Date.now }
 }, { bufferCommands: false });
 const Video = mongoose.model("Video", videoSchema);
 
@@ -60,10 +61,15 @@ class video {
     }
     list(apikey) {
         return new Promise((resolve, reject) => {
-            Video.find({ apikey: apikey }, "-timeslice -__v", (err, videos) => {
-                if (err) reject(err);
-                resolve(videos);
-            });
+            Video.find(
+                { apikey: apikey },
+                "-timeslice -__v",
+                { sort: "-timestamp" },
+                (err, videos) => {
+                    if (err) reject(err);
+                    resolve(videos);
+                }
+            );
         });
     }
 }

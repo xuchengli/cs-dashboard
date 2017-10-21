@@ -67,6 +67,7 @@
 </template>
 <script>
     import UIkit from "uikit";
+    import axios from "axios";
     import TopProgress from "../../components/top-progress.vue";
 
     export default {
@@ -104,8 +105,15 @@
         methods: {
             getVideos() {
                 this.loading = true;
-                setTimeout(() => {
+                axios("video/list").then(res => {
                     this.loading = false;
+                    for (let video of res.data) {
+                        this.videos.push({
+                            id: video._id,
+                            cover: "video/" + video._id + "/cover",
+                            overlay: false
+                        });
+                    }
                     this.$nextTick(() => {
                         UIkit.upload("#uploader", {
                             url: "video/upload",
@@ -145,7 +153,10 @@
                             }
                         });
                     });
-                }, 3000);
+                }).catch(err => {
+                    this.loading = false;
+                    UIkit.notification(this.$t("global.error.500"), "danger");
+                });
             }
         },
         components: {
