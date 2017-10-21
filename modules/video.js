@@ -3,6 +3,7 @@ const ffmpeg = require("fluent-ffmpeg");
 const Schema = mongoose.Schema;
 
 const videoSchema = new Schema({
+    apikey: { type: String, required: true },
     originalname: String,
     mimetype: String,
     destination: String,
@@ -40,9 +41,10 @@ class video {
             });
         });
     }
-    save(file) {
+    save(apikey, file) {
         return new Promise((resolve, reject) => {
             let video = new Video({
+                apikey: apikey,
                 originalname: file.originalname,
                 mimetype: file.mimetype,
                 destination: file.destination,
@@ -53,6 +55,14 @@ class video {
             video.save((err, video) => {
                 if (err) reject(err);
                 resolve(video);
+            });
+        });
+    }
+    list(apikey) {
+        return new Promise((resolve, reject) => {
+            Video.find({ apikey: apikey }, "-timeslice -__v", (err, videos) => {
+                if (err) reject(err);
+                resolve(videos);
             });
         });
     }

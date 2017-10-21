@@ -4,6 +4,7 @@ const path = require("path");
 const multer = require("multer");
 const dateFormat = require("dateformat");
 const mkdirp = require("mkdirp");
+const config = require("../modules/configuration");
 const Video = require("../modules/video");
 
 const router = express.Router();
@@ -33,7 +34,8 @@ router.post("/upload", upload, (req, res) => {
         if (slice) {
             Object.assign(req.file, { cover: cover });
         }
-        let saved = yield video.save(req.file);
+        let userInfo = JSON.parse(req.cookies[config.cookieName]);
+        let saved = yield video.save(userInfo.apikey, req.file);
         res.json(saved);
     }).catch(err => {
         console.error(err);
@@ -45,6 +47,17 @@ router.get("/:id/cover", (req, res) => {
         let video = new Video();
         let file = yield video.findById(req.params.id);
         res.sendFile(file.cover, { root: file.destination });
+    }).catch(err => {
+        console.error(err);
+        res.status(500).send(err);
+    });
+});
+router.get("/list", (req, res) => {
+    co(function* () {
+        let video = new Video();
+        let userInfo = JSON.parse(req.cookies[config.cookieName]);
+        let videos = yield video.list(userInfo.apikey);
+        res.json(videos);
     }).catch(err => {
         console.error(err);
         res.status(500).send(err);
