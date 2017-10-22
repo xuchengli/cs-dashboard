@@ -72,5 +72,16 @@ class video {
             );
         });
     }
+    remove(id) {
+        return new Promise((resolve, reject) => {
+            Video.findByIdAndRemove(id,
+                { select: { timeslice: 0, __v: 0 } },
+                (err, video) => {
+                    if (err) reject(err);
+                    resolve(video);
+                }
+            );
+        });
+    }
 }
 module.exports = video;

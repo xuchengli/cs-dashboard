@@ -3,7 +3,7 @@ const co = require("co");
 const path = require("path");
 const multer = require("multer");
 const dateFormat = require("dateformat");
-const mkdirp = require("mkdirp");
+const fs = require("fs-extra");
 const config = require("../modules/configuration");
 const Video = require("../modules/video");
 
@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         let datetime = dateFormat(new Date(), "yyyymmddHHMMss.l");
         let videoUploadDir = path.join(uploadDir, datetime);
-        mkdirp.sync(videoUploadDir);
+        fs.ensureDirSync(videoUploadDir);
         cb(null, videoUploadDir);
     },
     filename: (req, file, cb) => {
@@ -58,6 +58,17 @@ router.get("/list", (req, res) => {
         let userInfo = JSON.parse(req.cookies[config.cookieName]);
         let videos = yield video.list(userInfo.apikey);
         res.json(videos);
+    }).catch(err => {
+        console.error(err);
+        res.status(500).send(err);
+    });
+});
+router.delete("/:id", (req, res) => {
+    co(function* () {
+        let video = new Video();
+        let file = yield video.remove(req.params.id);
+        fs.removeSync(file.destination);
+        res.json(file);
     }).catch(err => {
         console.error(err);
         res.status(500).send(err);
