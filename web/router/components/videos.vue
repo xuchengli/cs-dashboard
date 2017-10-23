@@ -6,7 +6,10 @@
             "upload": "Upload",
             "empty": "No data.",
             "invalid-mime-msg": "Only video files are allowed.",
-            "upload-fail-msg": "Upload failed."
+            "upload-fail-msg": "Upload failed.",
+            "confirm-msg": "Are you sure to delete the video?",
+            "cancel": "Cancel",
+            "ok": "Ok"
         },
         "zh-CN": {
             "edit": "编辑",
@@ -14,7 +17,10 @@
             "upload": "上传",
             "empty": "没有记录！",
             "invalid-mime-msg": "只能上传视频文件！",
-            "upload-fail-msg": "上传失败！"
+            "upload-fail-msg": "上传失败！",
+            "confirm-msg": "你确信要删除这个视频吗？",
+            "cancel": "取消",
+            "ok": "确定"
         }
     }
 </i18n>
@@ -35,9 +41,11 @@
                     <img :src="video.cover" class="video">
                     <div class="uk-position-center" v-if="video.overlay">
                         <a class="uk-icon-button" uk-icon="icon: pencil"
-                            :class="{ 'uk-disabled': uploading }" uk-tooltip :title="$t('edit')"></a>
+                            :class="{ 'uk-disabled': uploading }" uk-tooltip :title="$t('edit')"
+                            @click="edit(video.id)"></a>
                         <a class="uk-icon-button uk-margin-small-left" uk-icon="icon: trash"
-                            :class="{ 'uk-disabled': uploading }" uk-tooltip :title="$t('delete')"></a>
+                            :class="{ 'uk-disabled': uploading }" uk-tooltip :title="$t('delete')"
+                            @click="remove(video.id)"></a>
                     </div>
                 </div>
             </div>
@@ -157,6 +165,23 @@
                     this.loading = false;
                     UIkit.notification(this.$t("global.error.500"), "danger");
                 });
+            },
+            edit(id) {
+                console.log("edit", id);
+            },
+            remove(id) {
+                UIkit.modal.confirm(this.$t("confirm-msg"), {
+                    labels: {
+                        ok: this.$t("ok"),
+                        cancel: this.$t("cancel")
+                    }
+                }).then(() => {
+                    axios.delete("video/" + id).then(res => {
+                        this.videos.splice(this.videos.findIndex(video => video.id === id), 1);
+                    }).catch(err => {
+                        UIkit.notification(this.$t("global.error.500"), "danger");
+                    });
+                }, () => {});
             }
         },
         components: {
