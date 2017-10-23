@@ -4,6 +4,7 @@ import Login from "./components/login.vue";
 import Register from "./components/register.vue";
 import Header from "./components/header.vue";
 import Videos from "./components/videos.vue";
+import Workbench from "./components/workbench.vue";
 
 Vue.use(VueRouter);
 
@@ -13,6 +14,13 @@ const router = new VueRouter({
         { name: "register", path: "/register", component: Register },
         {
             path: "/videos", component: Videos,
+            children: [
+                { path: "", component: Header }
+            ],
+            meta: { requiresAuth: true }
+        },
+        {
+            path: "/video/:id", component: Workbench,
             children: [
                 { path: "", component: Header }
             ],

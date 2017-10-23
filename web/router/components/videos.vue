@@ -167,7 +167,7 @@
                 });
             },
             edit(id) {
-                console.log("edit", id);
+                this.$router.push("/video/" + id);
             },
             remove(id) {
                 UIkit.modal.confirm(this.$t("confirm-msg"), {
