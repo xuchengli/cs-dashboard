@@ -20,7 +20,7 @@ const router = new VueRouter({
             meta: { requiresAuth: true }
         },
         {
-            path: "/video/:id", component: Workbench,
+            path: "/video/:id", component: Workbench, props: true,
             children: [
                 { path: "", component: Header }
             ],

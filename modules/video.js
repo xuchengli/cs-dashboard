@@ -36,7 +36,7 @@ class video {
     }
     findById(id) {
         return new Promise((resolve, reject) => {
-            Video.findById(id, (err, video) => {
+            Video.findById(id, "-__v -timestamp", (err, video) => {
                 if (err) reject(err);
                 resolve(video);
             });

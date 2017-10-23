@@ -74,4 +74,14 @@ router.delete("/:id", (req, res) => {
         res.status(500).send(err);
     });
 });
+router.get("/:id", (req, res) => {
+    co(function* () {
+        let video = new Video();
+        let file = yield video.findById(req.params.id);
+        res.json(file);
+    }).catch(err => {
+        console.error(err);
+        res.status(500).send(err);
+    });
+});
 module.exports = router;
