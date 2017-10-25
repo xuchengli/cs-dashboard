@@ -5,16 +5,13 @@ const Schema = mongoose.Schema;
 const videoSchema = new Schema({
     apikey: { type: String, required: true },
     originalname: String,
-    mimetype: String,
     destination: String,
     filename: String,
     cover: String,
-    size: Number,
     width: Number,
     height: Number,
     duration: Number,
-    frames: Number,
-    framerate: String,
+    frame_rate: Number,
     timeslice: [{
         no: Number,
         timepoint: String,
@@ -25,7 +22,7 @@ const videoSchema = new Schema({
 const Video = mongoose.model("Video", videoSchema);
 
 class video {
-    timeSlice(input, output, time) {
+    screenShot(input, output, time) {
         return new Promise((resolve, reject) => {
             ffmpeg(input).seekInput(time).output(output).noAudio().frames(1).on("end", () => {
                 resolve(true);
@@ -34,11 +31,32 @@ class video {
             }).run();
         });
     }
-    findById(id) {
+    probe(input) {
         return new Promise((resolve, reject) => {
-            Video.findById(id, "-__v -timestamp", (err, video) => {
+            ffmpeg(input).ffprobe((err, metadata) => {
                 if (err) reject(err);
-                resolve(video);
+                let probe = {};
+                let format = metadata.format;
+                if (format) {
+                    let streams = metadata.streams;
+                    let nb_streams = format.nb_streams;
+                    for (let i=0; i<nb_streams; i++) {
+                        if (streams[i].codec_type === "video") {
+                            let frame_rate = streams[i].avg_frame_rate;
+                            if (frame_rate && frame_rate.toUpperCase() !== "N/A") {
+                                frame_rate = eval(frame_rate);
+                            }
+                            Object.assign(probe, {
+                                fileurl: format.filename,
+                                width: streams[i].width,
+                                height: streams[i].height,
+                                duration: parseFloat(format.duration) || parseFloat(streams[i].duration),
+                                frame_rate: frame_rate
+                            });
+                        }
+                    }
+                }
+                resolve(probe);
             });
         });
     }
@@ -47,13 +65,23 @@ class video {
             let video = new Video({
                 apikey: apikey,
                 originalname: file.originalname,
-                mimetype: file.mimetype,
                 destination: file.destination,
                 filename: file.filename,
                 cover: file.cover,
-                size: file.size
+                width: file.width,
+                height: file.height,
+                duration: file.duration,
+                frame_rate: file.frame_rate
             });
             video.save((err, video) => {
+                if (err) reject(err);
+                resolve(video);
+            });
+        });
+    }
+    findById(id) {
+        return new Promise((resolve, reject) => {
+            Video.findById(id, "-__v -timestamp", (err, video) => {
                 if (err) reject(err);
                 resolve(video);
             });

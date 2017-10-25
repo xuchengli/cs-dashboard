@@ -3,22 +3,28 @@
         "en": {
             "edit": "Edit",
             "delete": "Delete",
-            "upload": "Upload",
+            "upload": "Upload Video",
+            "video-stream": "Open Video Stream",
             "empty": "No data.",
-            "invalid-mime-msg": "Only video files are allowed.",
+            "invalid-mime-msg": "Only video files of mp4 are allowed.",
             "upload-fail-msg": "Upload failed.",
+            "read-stream-fail-msg": "Read video stream failed.",
             "confirm-msg": "Are you sure to delete the video?",
+            "prompt-msg": "Video stream URL: <p class='uk-text-meta uk-margin-small-bottom'>e.g., {example}</p>",
             "cancel": "Cancel",
             "ok": "Ok"
         },
         "zh-CN": {
             "edit": "编辑",
             "delete": "删除",
-            "upload": "上传",
+            "upload": "上传视频",
+            "video-stream": "打开视频流",
             "empty": "没有记录！",
-            "invalid-mime-msg": "只能上传视频文件！",
+            "invalid-mime-msg": "只能上传 .mp4 格式的视频文件！",
             "upload-fail-msg": "上传失败！",
+            "read-stream-fail-msg": "读取视频流失败！",
             "confirm-msg": "你确信要删除这个视频吗？",
+            "prompt-msg": "视频流地址：<p class='uk-text-meta uk-margin-small-bottom'>例如，{example}</p>",
             "cancel": "取消",
             "ok": "确定"
         }
@@ -56,11 +62,17 @@
             </div>
             <div class="uk-flex uk-flex-between uk-flex-middle
                 uk-padding-small uk-padding-remove-horizontal uk-padding-remove-top">
-                <div id="uploader" class="uk-margin-left" uk-form-custom>
-                    <input type="file" :disabled="uploading">
-                    <button class="uk-button uk-button-primary" type="button"
-                        tabindex="-1" :disabled="uploading">
-                        {{ $t("upload") }}
+                <div class="uk-margin-left">
+                    <div id="uploader" uk-form-custom>
+                        <input type="file" :disabled="uploading">
+                        <button class="uk-button uk-button-primary" type="button"
+                            tabindex="-1" :disabled="uploading">
+                            {{ $t("upload") }}
+                        </button>
+                    </div>
+                    <button class="uk-button uk-button-secondary uk-margin-small-left"
+                        type="button" :disabled="uploading" @click="openStream">
+                        {{ $t("video-stream") }}
                     </button>
                 </div>
                 <ul class="uk-pagination uk-margin-remove-vertical uk-margin-right" v-if="totalPage > 1">
@@ -86,7 +98,8 @@
                 maxRowOnPage: 18,
                 pageNo: 1,
                 uploading: false,
-                uploadedPercentage: 0
+                uploadedPercentage: 0,
+                timer: null
             }
         },
         computed: {
@@ -126,7 +139,7 @@
                         UIkit.upload("#uploader", {
                             url: "video/upload",
                             name: "video",
-                            mime: "video/*",
+                            mime: "video/mp4",
                             dataType: "json",
                             fail: e => {
                                 UIkit.notification(this.$t("invalid-mime-msg"), "warning");
@@ -182,6 +195,56 @@
                         UIkit.notification(this.$t("global.error.500"), "danger");
                     });
                 }, () => {});
+            },
+            openStream() {
+                UIkit.modal.prompt(
+                    this.$t("prompt-msg", {
+                        example: "rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov"
+                    }),
+                    "",
+                    {
+                        labels: {
+                            ok: this.$t("ok"),
+                            cancel: this.$t("cancel")
+                        }
+                    }
+                ).then(url => {
+                    if (url) {
+                        this.uploading = true;
+                        this.uploadedPercentage = 0;
+                        this.trickProgress();
+                        axios.post("video/stream", { url: url }).then(res => {
+                            this.uploading = false;
+                            this.uploadedPercentage = 100;
+                            if (res.status === 200) {
+                                this.videos.unshift({
+                                    id: res.data._id,
+                                    cover: "video/" + res.data._id + "/cover",
+                                    overlay: false
+                                });
+                            } else {
+                                UIkit.notification(this.$t("read-stream-fail-msg"), "danger");
+                            }
+                        }).catch(err => {
+                            this.uploading = false;
+                            this.uploadedPercentage = 100;
+                            UIkit.notification(this.$t("global.error.500"), "danger");
+                        });
+                    }
+                });
+            },
+            trickProgress() {
+                if (this.uploadedPercentage < 90) {
+                    this.uploadedPercentage += 10;
+                } else if (this.uploadedPercentage < 100) {
+                    this.uploadedPercentage++;
+                }
+                if (this.timer) clearTimeout(this.timer);
+                if (this.uploadedPercentage < 100) {
+                    this.timer = setTimeout(() => {
+                        this.trickProgress();
+                    }, this.uploadedPercentage * Math.round(50 * Math.random()));
+                }
             }
         },
         components: {

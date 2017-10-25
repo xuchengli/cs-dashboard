@@ -26,16 +26,50 @@ router.post("/upload", upload, (req, res) => {
         let video = new Video();
         let destination = req.file.destination;
         let filename = req.file.filename;
-        let cover = filename.substring(0, filename.lastIndexOf(".")) + ".png";
 
         let input = path.join(destination, filename);
+        let probe = yield video.probe(input);
+        if (probe) {
+            Object.assign(req.file, probe);
+        }
+        let cover = filename.substring(0, filename.lastIndexOf(".")) + ".png";
         let output = path.join(destination, cover);
-        let slice = yield video.timeSlice(input, output, 0);
+        let slice = yield video.screenShot(input, output, 1);
         if (slice) {
             Object.assign(req.file, { cover: cover });
         }
         let userInfo = JSON.parse(req.cookies[config.cookieName]);
         let saved = yield video.save(userInfo.apikey, req.file);
+        res.json(saved);
+    }).catch(err => {
+        console.error(err);
+        res.status(500).send(err);
+    });
+});
+router.post("/stream", (req, res) => {
+    co(function* () {
+        let video = new Video();
+        let file = {};
+        let probe = yield video.probe(req.body.url);
+        if (probe) {
+            Object.assign(file, probe);
+        }
+        let fileurl = file.fileurl;
+        let filename = fileurl.substring(fileurl.lastIndexOf("/") + 1);
+        let cover = (filename.substring(0, filename.lastIndexOf(".")) || filename) + ".png";
+
+        file.originalname = fileurl;
+        file.destination = path.join(uploadDir, dateFormat(new Date(), "yyyymmddHHMMss.l"));
+        fs.ensureDirSync(file.destination);
+        file.filename = filename;
+
+        let output = path.join(file.destination, cover);
+        let slice = yield video.screenShot(req.body.url, output, 1);
+        if (slice) {
+            Object.assign(file, { cover: cover });
+        }
+        let userInfo = JSON.parse(req.cookies[config.cookieName]);
+        let saved = yield video.save(userInfo.apikey, file);
         res.json(saved);
     }).catch(err => {
         console.error(err);
