@@ -15,15 +15,13 @@ const storage = multer.diskStorage({
         let videoUploadDir = path.join(uploadDir, datetime);
         fs.ensureDirSync(videoUploadDir);
         cb(null, videoUploadDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname);
     }
 });
 const upload = multer({ storage: storage }).single("video");
 router.post("/upload", upload, (req, res) => {
     co(function* () {
         let video = new Video();
+        let originalname = req.file.originalname;
         let destination = req.file.destination;
         let filename = req.file.filename;
 
@@ -32,7 +30,7 @@ router.post("/upload", upload, (req, res) => {
         if (probe) {
             Object.assign(req.file, probe);
         }
-        let cover = filename.substring(0, filename.lastIndexOf(".")) + ".png";
+        let cover = originalname.substring(0, originalname.lastIndexOf(".")) + ".png";
         let output = path.join(destination, cover);
         let slice = yield video.screenShot(input, output, 1);
         if (slice) {
@@ -116,7 +114,17 @@ router.get("/:id", (req, res) => {
     co(function* () {
         let video = new Video();
         let file = yield video.findById(req.params.id);
-        res.json(file);
+        if (file) {
+            let stream = file.originalname;
+            if (file.source_type === "file") {
+                let subdir = file.destination.substring(file.destination.lastIndexOf(path.sep) + 1);
+                stream = "rtsp://localhost:80/file/" + subdir + "/" + file.filename;
+            }
+            console.log(stream);
+            res.json(file);
+        } else {
+            res.sendStatus(404);
+        }
     }).catch(err => {
         console.error(err);
         res.status(500).send(err);

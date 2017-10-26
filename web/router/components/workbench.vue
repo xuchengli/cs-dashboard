@@ -1,10 +1,12 @@
 <i18n>
     {
         "en": {
-            "my-videos": "My videos"
+            "my-videos": "My videos",
+            "error404": "The video is not exist."
         },
         "zh-CN": {
-            "my-videos": "我的视频"
+            "my-videos": "我的视频",
+            "error404": "视频不存在！"
         }
     }
 </i18n>
@@ -48,7 +50,11 @@
                     this.video = Object.assign({}, this.video, res.data);
                 }).catch(err => {
                     this.loading = false;
-                    UIkit.notification(this.$t("global.error.500"), "danger");
+                    if (err.response.status === 404) {
+                        UIkit.notification(this.$t("error404"), "danger");
+                    } else if (err.response.status === 500) {
+                        UIkit.notification(this.$t("global.error.500"), "danger");
+                    }
                 });
             }
         }
