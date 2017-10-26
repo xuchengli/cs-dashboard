@@ -38,6 +38,7 @@ router.post("/upload", upload, (req, res) => {
         if (slice) {
             Object.assign(req.file, { cover: cover });
         }
+        Object.assign(req.file, { source_type: "file" });
         let userInfo = JSON.parse(req.cookies[config.cookieName]);
         let saved = yield video.save(userInfo.apikey, req.file);
         res.json(saved);
@@ -57,13 +58,16 @@ router.post("/stream", (req, res) => {
         let fileurl = file.fileurl;
         let filename = fileurl.substring(fileurl.lastIndexOf("/") + 1);
         let cover = (filename.substring(0, filename.lastIndexOf(".")) || filename) + ".png";
+        let destination = path.join(uploadDir, dateFormat(new Date(), "yyyymmddHHMMss.l"));
+        fs.ensureDirSync(destination);
 
-        file.originalname = fileurl;
-        file.destination = path.join(uploadDir, dateFormat(new Date(), "yyyymmddHHMMss.l"));
-        fs.ensureDirSync(file.destination);
-        file.filename = filename;
-
-        let output = path.join(file.destination, cover);
+        Object.assign(file, {
+            source_type: "stream",
+            originalname: fileurl,
+            destination: destination,
+            filename: filename
+        });
+        let output = path.join(destination, cover);
         let slice = yield video.screenShot(req.body.url, output, 1);
         if (slice) {
             Object.assign(file, { cover: cover });

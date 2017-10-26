@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 
 const videoSchema = new Schema({
     apikey: { type: String, required: true },
+    source_type: String,
     originalname: String,
     destination: String,
     filename: String,
@@ -64,6 +65,7 @@ class video {
         return new Promise((resolve, reject) => {
             let video = new Video({
                 apikey: apikey,
+                source_type: file.source_type,
                 originalname: file.originalname,
                 destination: file.destination,
                 filename: file.filename,
