@@ -1,11 +1,11 @@
 <i18n>
     {
         "en": {
-            "title": "Cognitive Solution Dashboard",
+            "title": "Video Insight",
             "logout": "Logout"
         },
         "zh-CN": {
-            "title": "认知解决方案操作面板",
+            "title": "视频编辑面板",
             "logout": "退出"
         }
     }

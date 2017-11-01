@@ -24,13 +24,9 @@ router.post("/upload", upload, (req, res) => {
         let originalname = req.file.originalname;
         let destination = req.file.destination;
         let filename = req.file.filename;
+        let cover = originalname.substring(0, originalname.lastIndexOf(".")) + ".png";
 
         let input = path.join(destination, filename);
-        let probe = yield video.probe(input);
-        if (probe) {
-            Object.assign(req.file, probe);
-        }
-        let cover = originalname.substring(0, originalname.lastIndexOf(".")) + ".png";
         let output = path.join(destination, cover);
         let slice = yield video.screenShot(input, output, 1);
         if (slice) {
@@ -49,11 +45,7 @@ router.post("/stream", (req, res) => {
     co(function* () {
         let video = new Video();
         let file = {};
-        let probe = yield video.probe(req.body.url);
-        if (probe) {
-            Object.assign(file, probe);
-        }
-        let fileurl = file.fileurl;
+        let fileurl = req.body.url;
         let filename = fileurl.substring(fileurl.lastIndexOf("/") + 1);
         let cover = (filename.substring(0, filename.lastIndexOf(".")) || filename) + ".png";
         let destination = path.join(uploadDir, dateFormat(new Date(), "yyyymmddHHMMss.l"));
@@ -66,7 +58,7 @@ router.post("/stream", (req, res) => {
             filename: filename
         });
         let output = path.join(destination, cover);
-        let slice = yield video.screenShot(req.body.url, output, 1);
+        let slice = yield video.screenShot(fileurl, output, 1);
         if (slice) {
             Object.assign(file, { cover: cover });
         }
@@ -115,13 +107,17 @@ router.get("/:id", (req, res) => {
         let video = new Video();
         let file = yield video.findById(req.params.id);
         if (file) {
-            let stream = file.originalname;
+            let fileurl = file.originalname;
             if (file.source_type === "file") {
-                let subdir = file.destination.substring(file.destination.lastIndexOf(path.sep) + 1);
-                stream = "rtsp://localhost:80/file/" + subdir + "/" + file.filename;
+                fileurl = req.protocol + "://" + req.get("host") +
+                        config.Context_Path + "/api/video/" + req.params.id;
             }
-            console.log(stream);
-            res.json(file);
+            /**
+             * 调用获取websocket视频流的API
+            **/
+            console.log(fileurl);
+            let wsurl = "ws://9.186.106.206/video/23c3ac3414984b46b070a074a05b52b5";
+            res.json(Object.assign(file, { websocket_stream: wsurl }));
         } else {
             res.sendStatus(404);
         }

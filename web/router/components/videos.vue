@@ -6,7 +6,7 @@
             "upload": "Upload Video",
             "video-stream": "Open Video Stream",
             "empty": "No data.",
-            "invalid-mime-msg": "Only video files of mp4 are allowed.",
+            "invalid-mime-msg": "Only video files are allowed.",
             "upload-fail-msg": "Upload failed.",
             "read-stream-fail-msg": "Read video stream failed.",
             "confirm-msg": "Are you sure to delete the video?",
@@ -20,7 +20,7 @@
             "upload": "上传视频",
             "video-stream": "打开视频流",
             "empty": "没有记录！",
-            "invalid-mime-msg": "只能上传 .mp4 格式的视频文件！",
+            "invalid-mime-msg": "只能上传视频文件！",
             "upload-fail-msg": "上传失败！",
             "read-stream-fail-msg": "读取视频流失败！",
             "confirm-msg": "你确信要删除这个视频吗？",
@@ -139,7 +139,7 @@
                         UIkit.upload("#uploader", {
                             url: "video/upload",
                             name: "video",
-                            mime: "video/mp4",
+                            mime: "video/*",
                             dataType: "json",
                             fail: e => {
                                 UIkit.notification(this.$t("invalid-mime-msg"), "warning");

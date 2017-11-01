@@ -2,6 +2,7 @@ const express = require("express");
 const co = require("co");
 const config = require("../modules/configuration");
 const User = require("../modules/user");
+const Video = require("../modules/video");
 
 const router = express.Router();
 router.post("/register", (req, res) => {
@@ -48,6 +49,16 @@ router.post("/login", (req, res) => {
         } else {
             throw new Error(validation.description);
         }
+    }).catch(err => {
+        console.error(err);
+        res.status(500).send(err);
+    });
+});
+router.get("/video/:id", (req, res) => {
+    co(function* () {
+        let video = new Video();
+        let file = yield video.findById(req.params.id);
+        res.sendFile(file.filename, { root: file.destination });
     }).catch(err => {
         console.error(err);
         res.status(500).send(err);
