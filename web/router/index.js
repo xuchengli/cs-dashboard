@@ -5,6 +5,7 @@ import Register from "./components/register.vue";
 import Header from "./components/header.vue";
 import Videos from "./components/videos.vue";
 import Workbench from "./components/workbench.vue";
+import APIList from "./components/api-list.vue";
 
 Vue.use(VueRouter);
 
@@ -22,7 +23,7 @@ const router = new VueRouter({
         {
             path: "/video/:id", component: Workbench, props: true,
             children: [
-                { path: "", component: Header }
+                { path: "", components: { "default": Header, "api-list": APIList } }
             ],
             meta: { requiresAuth: true }
         }

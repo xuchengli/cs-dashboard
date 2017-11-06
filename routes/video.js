@@ -116,7 +116,7 @@ router.get("/:id", (req, res) => {
              * 调用获取websocket视频流的API
             **/
             console.log(fileurl);
-            let wsurl = "ws://9.186.106.206/video/23c3ac3414984b46b070a074a05b52b5";
+            let wsurl = "ws://9.186.106.206/video/5638f701205642238e589ecbd5439d7e";
             res.json(Object.assign(file, { websocket_stream: wsurl }));
         } else {
             res.sendStatus(404);

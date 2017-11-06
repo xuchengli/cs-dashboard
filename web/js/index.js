@@ -1,4 +1,5 @@
 import "uikit/dist/css/uikit.css";
+import "ol/ol.css";
 import Vue from "vue";
 import VueI18n from "vue-i18n";
 import VueCookie from "vue-cookie";
