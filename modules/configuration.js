@@ -1,5 +1,6 @@
 module.exports = {
     cookieName: "csda", //Cognitive Solution Dashboard Account
+    tokenCookie: "token",
     SV_BaseURL: process.env.SV_BaseURL || "https://ptopenlab.com/cloudlab/api/",
     mongodb: {
         //if need to auth, the URI of env is:
@@ -13,5 +14,6 @@ module.exports = {
             id: "vbadmin",
             password: "vbadminpassw0rd"
         }
-    }
+    },
+    Video_Stream_API: process.env.Video_Stream_API || "http://9.186.106.206:8083/demo_video/stream"
 };

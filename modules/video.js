@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const ffmpeg = require("fluent-ffmpeg");
+const axios = require("axios");
+const config = require("./configuration");
 const Schema = mongoose.Schema;
 
 const videoSchema = new Schema({
@@ -69,6 +71,30 @@ class video {
                     resolve(video);
                 }
             );
+        });
+    }
+    getStream(src, api) {
+        return new Promise((resolve, reject) => {
+            axios.post(config.Video_Stream_API, {
+                video_src: src,
+                api: api
+            }).then(res => resolve(res.data)).catch(err => reject(err));
+        });
+    }
+    bindAPI(url, api) {
+        return new Promise((resolve, reject) => {
+            axios.post("/api/operate", {
+                action: "add",
+                api: api
+            }, { baseURL: url }).then(res => resolve(res.data)).catch(err => reject(err));
+        });
+    }
+    unbindAPI(url, api) {
+        return new Promise((resolve, reject) => {
+            axios.post("/api/operate", {
+                action: "remove",
+                api: api
+            }, { baseURL: url }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
 }

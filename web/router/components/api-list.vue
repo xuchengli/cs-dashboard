@@ -25,7 +25,11 @@
                     <span class="uk-text-truncate" uk-tooltip :title="api.categories">
                         {{ api.categories }}
                     </span>
-                    <a uk-icon="icon: plus-circle"></a>
+                    <div uk-spinner="ratio: .7" v-if="api.status === 'operating'"></div>
+                    <span uk-icon="icon: check" v-else-if="api.status === 'success'"></span>
+                    <a uk-icon="icon: minus-circle" @click="unbind(api.id)"
+                        v-else-if="api.status === 'bind'"></a>
+                    <a uk-icon="icon: plus-circle" @click="bind(api.id)" v-else></a>
                 </div>
             </li>
         </ul>
@@ -36,6 +40,7 @@
     import axios from "axios";
 
     export default {
+        props: ["stream_api"],
         data() {
             return {
                 loading: false,
@@ -65,6 +70,34 @@
                     }
                 }).catch(err => {
                     this.loading = false;
+                    UIkit.notification(this.$t("global.error.500"), "danger");
+                });
+            },
+            bind(id) {
+                let api = this.apis.find(api => api.id === id);
+                api.status = "operating";
+                axios.post("video/bind/" + id, {
+                    url: this.stream_api
+                }).then(res => {
+                    console.log("bind API", res.data);
+                    api.status = "success";
+                    setTimeout(() => api.status = "bind", 1000);
+                }).catch(err => {
+                    api.status = "unbind";
+                    UIkit.notification(this.$t("global.error.500"), "danger");
+                });
+            },
+            unbind(id) {
+                let api = this.apis.find(api => api.id === id);
+                api.status = "operating";
+                axios.post("video/unbind/" + id, {
+                    url: this.stream_api
+                }).then(res => {
+                    console.log("unbind API", res.data);
+                    api.status = "success";
+                    setTimeout(() => api.status = "unbind", 1000);
+                }).catch(err => {
+                    api.status = "bind";
                     UIkit.notification(this.$t("global.error.500"), "danger");
                 });
             }

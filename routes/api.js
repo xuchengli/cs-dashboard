@@ -18,7 +18,7 @@ router.post("/register", (req, res) => {
             let account = yield user.account(apikey);
             let tokens = yield av.getToken(account.username);
             if (tokens.token) {
-                Object.assign(account, { token: tokens.token });
+                res.cookie(config.tokenCookie, tokens.token);
             }
             res.cookie(config.cookieName, JSON.stringify(account));
             res.json(account);
@@ -29,7 +29,7 @@ router.post("/register", (req, res) => {
         }
     }).catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.sendStatus(500);
     });
 });
 router.post("/login", (req, res) => {
@@ -45,7 +45,7 @@ router.post("/login", (req, res) => {
             let account = yield user.account(apikey);
             let tokens = yield av.getToken(account.username);
             if (tokens.token) {
-                Object.assign(account, { token: tokens.token });
+                res.cookie(config.tokenCookie, tokens.token);
             }
             if (rememberme) {
                 res.cookie(config.cookieName, JSON.stringify(account), {
@@ -62,7 +62,7 @@ router.post("/login", (req, res) => {
         }
     }).catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.sendStatus(500);
     });
 });
 router.get("/video/:id", (req, res) => {
@@ -72,7 +72,7 @@ router.get("/video/:id", (req, res) => {
         res.sendFile(file.filename, { root: file.destination });
     }).catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.sendStatus(500);
     });
 });
 module.exports = router;

@@ -38,7 +38,7 @@ router.post("/upload", upload, (req, res) => {
         res.json(saved);
     }).catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.sendStatus(500);
     });
 });
 router.post("/stream", (req, res) => {
@@ -67,7 +67,7 @@ router.post("/stream", (req, res) => {
         res.json(saved);
     }).catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.sendStatus(500);
     });
 });
 router.get("/:id/cover", (req, res) => {
@@ -77,7 +77,7 @@ router.get("/:id/cover", (req, res) => {
         res.sendFile(file.cover, { root: file.destination });
     }).catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.sendStatus(500);
     });
 });
 router.get("/list", (req, res) => {
@@ -88,7 +88,7 @@ router.get("/list", (req, res) => {
         res.json(videos);
     }).catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.sendStatus(500);
     });
 });
 router.delete("/:id", (req, res) => {
@@ -99,7 +99,7 @@ router.delete("/:id", (req, res) => {
         res.json(file);
     }).catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.sendStatus(500);
     });
 });
 router.get("/:id", (req, res) => {
@@ -115,15 +115,42 @@ router.get("/:id", (req, res) => {
             /**
              * 调用获取websocket视频流的API
             **/
-            console.log(fileurl);
-            let wsurl = "ws://9.186.106.206/video/5638f701205642238e589ecbd5439d7e";
-            res.json(Object.assign(file, { websocket_stream: wsurl }));
+            let videoStream = yield video.getStream(fileurl, "");
+            if (videoStream.success) {
+                res.json(Object.assign(file, {
+                    stream_id: videoStream.stream_id,
+                    stream_address: videoStream.stream_address,
+                    stream_api: videoStream.stream_api
+                }));
+            } else {
+                res.sendStatus(503);
+            }
         } else {
             res.sendStatus(404);
         }
     }).catch(err => {
         console.error(err);
-        res.status(500).send(err);
+        res.sendStatus(500);
+    });
+});
+router.post("/bind/:api", (req, res) => {
+    co(function* () {
+        let video = new Video();
+        let binded = yield video.bindAPI(req.body.url, req.params.api);
+        res.json(binded);
+    }).catch(err => {
+        console.error(err);
+        res.sendStatus(500);
+    });
+});
+router.post("/unbind/:api", (req, res) => {
+    co(function* () {
+        let video = new Video();
+        let unbinded = yield video.unbindAPI(req.body.url, req.params.api);
+        res.json(unbinded);
+    }).catch(err => {
+        console.error(err);
+        res.sendStatus(500);
     });
 });
 module.exports = router;

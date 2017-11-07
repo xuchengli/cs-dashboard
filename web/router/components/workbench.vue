@@ -6,7 +6,7 @@
             "api": "API",
             "event-monitor": "Event monitor",
             "error404": "The video is not exist.",
-            "read-stream-fail": "Read video stream failed."
+            "error503": "The video stream service unavailable."
         },
         "zh-CN": {
             "my-videos": "我的视频",
@@ -14,7 +14,7 @@
             "api": "视频识别接口",
             "event-monitor": "事件监控",
             "error404": "视频不存在！",
-            "read-stream-fail": "读取视频流失败！"
+            "error503": "视频流服务不可用！"
         }
     }
 </i18n>
@@ -56,7 +56,7 @@
                             <h4 class="uk-h4">{{ $t("api") }}</h4>
                         </div>
                         <div class="uk-card-body uk-card-content-padding">
-                            <router-view name="api-list"></router-view>
+                            <router-view name="api-list" :stream_api="video.stream_api"></router-view>
                         </div>
                     </div>
                 </div>
@@ -149,31 +149,26 @@
                     this.loading = false;
                     this.video = Object.assign({}, this.video, res.data);
                     this.$nextTick(() => {
-                        let player = new JSMpeg.Player(this.video.websocket_stream, {
+                        let player = new JSMpeg.Player(this.video.stream_address, {
                             disableGl: true,
                             silence: true
                         });
-                        player.source.socket.addEventListener("open", evt => {
-                            this.stream = player.video;
-                            let projection = new Projection({
-                                code: "video-image",
-                                units: "pixels"
-                            });
-                            this.map = new Map({
-                                target: "video-canvas",
-                                pixelRatio: 1,
-                                layers: [],
-                                controls: Control.defaults({ zoom: false }),
-                                logo: false,
-                                view: new View({
-                                    projection: projection,
-                                    center: [0, 0],
-                                    resolution: 1
-                                })
-                            });
+                        this.stream = player.video;
+                        let projection = new Projection({
+                            code: "video-image",
+                            units: "pixels"
                         });
-                        player.source.socket.addEventListener("error", evt => {
-                            UIkit.notification(this.$t("read-stream-fail"), "danger");
+                        this.map = new Map({
+                            target: "video-canvas",
+                            pixelRatio: 1,
+                            layers: [],
+                            controls: Control.defaults({ zoom: false }),
+                            logo: false,
+                            view: new View({
+                                projection: projection,
+                                center: [0, 0],
+                                resolution: 1
+                            })
                         });
                     });
                 }).catch(err => {
@@ -182,6 +177,8 @@
                         UIkit.notification(this.$t("error404"), "danger");
                     } else if (err.response.status === 500) {
                         UIkit.notification(this.$t("global.error.500"), "danger");
+                    } else if (err.response.status === 503) {
+                        UIkit.notification(this.$t("error503"), "danger");
                     }
                 });
             }

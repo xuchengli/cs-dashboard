@@ -18,7 +18,13 @@ class aivision {
             axios("/webapis", {
                 baseURL: config.AI_VISION.api,
                 headers: { "X-Auth-Token": token }
-            }).then(res => resolve(res.data)).catch(err => reject(err));
+            }).then(res => resolve(res.data)).catch(err => {
+                if (err.response && err.response.status === 401) {
+                    resolve(err.response.data);
+                } else {
+                    reject(err);
+                }
+            });
         });
     }
 }
