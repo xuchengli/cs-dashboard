@@ -8,7 +8,7 @@ module.exports = {
     },
     Context_Path: process.env.Context_Path || "/cs",
     AI_VISION: {
-        api: process.env.AI_VISION_API || "http://9.186.106.213:9080/powerai-vision/api",
+        api: process.env.AI_VISION_API || "http://9.186.91.76:8080/vision-service/api",
         admin: {
             id: "vbadmin",
             password: "vbadminpassw0rd"
