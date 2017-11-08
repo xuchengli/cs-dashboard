@@ -1,13 +1,18 @@
 version: "3"
 services:
   dashboard:
-    build: .
+    build:
+      context: .
+      args:
+        app_env: ${APP_ENV}
     image: cognitive-solution-dashboard
     container_name: cs-dashboard
     environment:
       - AI_VISION_API=${AI_VISION_API:-http://9.186.91.76:8080/vision-service/api}
       - Video_Stream_API=${Video_Stream_API:-http://9.186.106.206:8083/demo_video/stream}
       - MongoDB_URI=${MongoDB_URI:-mongodb://dashboard_mongo:27017/cognitive_solution}
+    volumes:
+      - ./:/usr/app/src
     links:
       - mongodb:dashboard_mongo
     ports:

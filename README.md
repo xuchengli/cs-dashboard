@@ -7,7 +7,17 @@ It is cognitive solution dashboard
 
 2. Build app image.
 
+	2.1. Build in development mode.
+
 	```
+	$ export APP_ENV=development
+	$ docker-compose build
+	```
+
+	2.2. Build in production mode.
+
+	```
+	$ export APP_ENV=production
 	$ docker-compose build
 	```
 
