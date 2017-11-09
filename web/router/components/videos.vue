@@ -157,7 +157,7 @@
                                 this.uploading = false;
                                 this.uploadedPercentage = 100;
                                 if (e.status === 200) {
-                                    let response = e.responseJSON;
+                                    let response = JSON.parse(e.responseText);
                                     this.videos.unshift({
                                         id: response._id,
                                         cover: "video/" + response._id + "/cover",

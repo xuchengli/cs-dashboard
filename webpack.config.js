@@ -45,6 +45,7 @@ let config = {
 };
 if (production) {
     config = merge(config, {
+        devtool: "source-map",
         module: {
             rules: [
                 {
@@ -92,7 +93,8 @@ if (production) {
                 comments: false,
                 compress: {
                     warnings: false
-                }
+                },
+                sourceMap: true
             })
         ]
     });

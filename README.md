@@ -43,3 +43,9 @@ It is cognitive solution dashboard
 	```
 	$ docker-compose rm -f
 	```
+
+3. Tail the logs.
+
+	```
+	$ docker-compose logs -f
+	```
