@@ -107,26 +107,28 @@ router.get("/:id", (req, res) => {
         let video = new Video();
         let file = yield video.findById(req.params.id);
         if (file) {
-            let fileurl = file.originalname;
+            let src = file.originalname;
             if (file.source_type === "file") {
-                fileurl = req.protocol + "://" + req.get("host") +
-                        config.Context_Path + "/api/video/" + req.params.id;
+                src = req.protocol + "://" + req.get("host") +
+                    config.Context_Path + "/api/video/" + req.params.id;
             }
-            /**
-             * 调用获取websocket视频流的API
-            **/
-            let videoStream = yield video.getStream(fileurl, "");
-            if (videoStream.success) {
-                res.json(Object.assign(file, {
-                    stream_id: videoStream.stream_id,
-                    stream_address: videoStream.stream_address,
-                    stream_api: videoStream.stream_api
-                }));
-            } else {
-                res.sendStatus(503);
-            }
+            res.json(Object.assign(file, { src: src }));
         } else {
             res.sendStatus(404);
+        }
+    }).catch(err => {
+        console.error(err);
+        res.sendStatus(500);
+    });
+});
+router.post("/websocket", (req, res) => {
+    co(function* () {
+        let video = new Video();
+        let videoStream = yield video.getStream(req.body.src, "");
+        if (videoStream.success) {
+            res.json(videoStream);
+        } else {
+            res.sendStatus(503);
         }
     }).catch(err => {
         console.error(err);

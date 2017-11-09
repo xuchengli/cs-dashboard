@@ -49,3 +49,9 @@ It is cognitive solution dashboard
 	```
 	$ docker-compose logs -f
 	```
+
+4. Restart my app.
+
+	```
+	$ docker-compose restart
+	```
