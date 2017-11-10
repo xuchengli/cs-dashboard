@@ -11,6 +11,9 @@ const videoSchema = new Schema({
     destination: String,
     filename: String,
     cover: String,
+    stream_id: String,
+    stream_address: String,
+    stream_api: String,
     timestamp: { type: Date, default: Date.now }
 }, { bufferCommands: false });
 const Video = mongoose.model("Video", videoSchema);
@@ -73,12 +76,30 @@ class video {
             );
         });
     }
-    getStream(src, api) {
+    createStream(src, api) {
         return new Promise((resolve, reject) => {
             axios.post(config.Video_Stream_API, {
                 video_src: src,
                 api: api
             }).then(res => resolve(res.data)).catch(err => reject(err));
+        });
+    }
+    setStream(videoId, stream) {
+        return new Promise((resolve, reject) => {
+            Video.findByIdAndUpdate(videoId,
+                {
+                    $set: {
+                        stream_id: stream.stream_id,
+                        stream_address: stream.stream_address,
+                        stream_api: stream.stream_api
+                    }
+                },
+                { new: true, select: { __v: 0 } },
+                (err, video) => {
+                    if (err) reject(err);
+                    resolve(video);
+                }
+            );
         });
     }
     bindAPI(url, api) {
@@ -95,6 +116,13 @@ class video {
                 action: "remove",
                 api: api
             }, { baseURL: url }).then(res => resolve(res.data)).catch(err => reject(err));
+        });
+    }
+    deleteStream(id) {
+        return new Promise((resolve, reject) => {
+            axios.delete(config.Video_Stream_API, {
+                id: id
+            }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
 }

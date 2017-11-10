@@ -60,7 +60,7 @@
                 </div>
                 <div class="uk-card uk-card-default uk-margin-left uk-width-expand">
                     <div class="uk-card-body uk-padding-remove">
-                        <router-view name="video-player" :src="video.src"></router-view>
+                        <router-view name="video-player" :src="video.stream_address"></router-view>
                     </div>
                     <div class="uk-card-footer uk-padding-remove">
                     </div>

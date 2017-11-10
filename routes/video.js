@@ -35,7 +35,16 @@ router.post("/upload", upload, (req, res) => {
         Object.assign(req.file, { source_type: "file" });
         let userInfo = JSON.parse(req.cookies[config.cookieName]);
         let saved = yield video.save(userInfo.apikey, req.file);
-        res.json(saved);
+        //创建视频流
+        let videoSrc = req.protocol + "://" + req.get("host") +
+                    config.Context_Path + "/api/video/" + saved._id;
+        let videoStream = yield video.createStream(videoSrc, "");
+        if (videoStream.success) {
+            let integratedVideo = yield video.setStream(saved._id, videoStream);
+            res.json(integratedVideo);
+        } else {
+            res.sendStatus(503);
+        }
     }).catch(err => {
         console.error(err);
         res.sendStatus(500);
@@ -64,7 +73,14 @@ router.post("/stream", (req, res) => {
         }
         let userInfo = JSON.parse(req.cookies[config.cookieName]);
         let saved = yield video.save(userInfo.apikey, file);
-        res.json(saved);
+        //创建视频流
+        let videoStream = yield video.createStream(fileurl, "");
+        if (videoStream.success) {
+            let integratedVideo = yield video.setStream(saved._id, videoStream);
+            res.json(integratedVideo);
+        } else {
+            res.sendStatus(503);
+        }
     }).catch(err => {
         console.error(err);
         res.sendStatus(500);
@@ -96,7 +112,13 @@ router.delete("/:id", (req, res) => {
         let video = new Video();
         let file = yield video.remove(req.params.id);
         fs.removeSync(file.destination);
-        res.json(file);
+        //删除视频流
+        let streamDeleted = yield video.deleteStream(file.stream_id);
+        if (streamDeleted.success) {
+            res.json(file);
+        } else {
+            res.sendStatus(503);
+        }
     }).catch(err => {
         console.error(err);
         res.sendStatus(500);
@@ -107,28 +129,9 @@ router.get("/:id", (req, res) => {
         let video = new Video();
         let file = yield video.findById(req.params.id);
         if (file) {
-            let src = file.originalname;
-            if (file.source_type === "file") {
-                src = req.protocol + "://" + req.get("host") +
-                    config.Context_Path + "/api/video/" + req.params.id;
-            }
-            res.json(Object.assign(file, { src: src }));
+            res.json(file);
         } else {
             res.sendStatus(404);
-        }
-    }).catch(err => {
-        console.error(err);
-        res.sendStatus(500);
-    });
-});
-router.post("/websocket", (req, res) => {
-    co(function* () {
-        let video = new Video();
-        let videoStream = yield video.getStream(req.body.src, "");
-        if (videoStream.success) {
-            res.json(videoStream);
-        } else {
-            res.sendStatus(503);
         }
     }).catch(err => {
         console.error(err);

@@ -1,13 +1,3 @@
-<i18n>
-    {
-        "en": {
-            "error503": "The video stream service unavailable."
-        },
-        "zh-CN": {
-            "error503": "视频流服务不可用！"
-        }
-    }
-</i18n>
 <template>
     <div class="player">
         <div id="video-canvas" class="uk-width-1-1 uk-height-1-1"></div>
@@ -41,11 +31,11 @@
                 dy: 0
             }
         },
-        created() {
-            this.getWebSocket();
+        mounted() {
+            this.init();
         },
         watch: {
-            "$route": "getWebSocket",
+            "$route": "init",
             "video.currentFrame": function(frame) {
                 if (frame > 0) {
                     if (frame === 1) {
@@ -82,36 +72,27 @@
             }
         },
         methods: {
-            getWebSocket() {
+            init() {
                 this.loading = true;
-                axios.post("video/websocket", { src: this.src }).then(res => {
-                    this.player = new JSMpeg.Player(res.data.stream_address, {
-                        disableGl: true,
-                        silence: true
-                    });
-                    this.video = this.player.video;
-                    this.map = new Map({
-                        target: "video-canvas",
-                        pixelRatio: 1,
-                        layers: [],
-                        controls: Control.defaults({ zoom: false }),
-                        logo: false,
-                        view: new View({
-                            projection: new Projection({
-                                code: "video-image",
-                                units: "pixels"
-                            }),
-                            center: [0, 0],
-                            resolution: 1
-                        })
-                    });
-                }).catch(err => {
-                    this.loading = false;
-                    if (err.response.status === 503) {
-                        UIkit.notification(this.$t("error503"), "danger");
-                    } else if (err.response.status === 500) {
-                        UIkit.notification(this.$t("global.error.500"), "danger");
-                    }
+                this.player = new JSMpeg.Player(this.src, {
+                    disableGl: true,
+                    silence: true
+                });
+                this.video = this.player.video;
+                this.map = new Map({
+                    target: "video-canvas",
+                    pixelRatio: 1,
+                    layers: [],
+                    controls: Control.defaults({ zoom: false }),
+                    logo: false,
+                    view: new View({
+                        projection: new Projection({
+                            code: "video-image",
+                            units: "pixels"
+                        }),
+                        center: [0, 0],
+                        resolution: 1
+                    })
                 });
             }
         },

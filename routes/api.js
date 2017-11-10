@@ -69,7 +69,11 @@ router.get("/video/:id", (req, res) => {
     co(function* () {
         let video = new Video();
         let file = yield video.findById(req.params.id);
-        res.sendFile(file.filename, { root: file.destination });
+        if (file) {
+            res.sendFile(file.filename, { root: file.destination });
+        } else {
+            res.sendStatus(404);
+        }
     }).catch(err => {
         console.error(err);
         res.sendStatus(500);
