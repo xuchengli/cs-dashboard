@@ -7,7 +7,6 @@ import UIkit from "uikit";
 import Icons from "uikit/dist/js/uikit-icons";
 import router from "../router";
 import LocaleSelect from "../components/locale-select.vue";
-import "./icons";
 
 UIkit.use(Icons);
 Vue.use(VueI18n);

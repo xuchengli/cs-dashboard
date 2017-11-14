@@ -34,19 +34,8 @@
                         <div class="uk-card-header uk-card-content-padding">
                             <h4 class="uk-h4">{{ $t("toolkit") }}</h4>
                         </div>
-                        <div class="uk-card-body uk-card-content-padding
-                            uk-flex uk-flex-wrap uk-flex-wrap-around">
-                            <div class="uk-width-1-6"><icon name="image"></icon></div>
-                            <div class="uk-width-1-6"><icon name="segment"></icon></div>
-                            <div class="uk-width-1-6"><icon name="path"></icon></div>
-                            <div class="uk-width-1-6"><icon name="curve"></icon></div>
-                            <div class="uk-width-1-6"><icon name="square"></icon></div>
-                            <div class="uk-width-1-6"><icon name="rectangle"></icon></div>
-                            <div class="uk-width-1-6"><icon name="triangle"></icon></div>
-                            <div class="uk-width-1-6"><icon name="circle"></icon></div>
-                            <div class="uk-width-1-6"><icon name="ellipse"></icon></div>
-                            <div class="uk-width-1-6"><icon name="polygon"></icon></div>
-                            <div class="uk-width-1-6"><icon name="curveSurface"></icon></div>
+                        <div class="uk-card-body uk-card-content-padding">
+                            <router-view name="toolkit"></router-view>
                         </div>
                     </div>
                     <div class="uk-card uk-card-default uk-margin-top">
@@ -77,7 +66,6 @@
 <script>
     import UIkit from "uikit";
     import axios from "axios";
-    import "vue-awesome/icons/image";
 
     export default {
         props: ["id"],

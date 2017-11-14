@@ -1,8 +1,4 @@
-import Vue from "vue";
-import Icon from "vue-awesome/components/Icon.vue";
-
-Vue.component("icon", Icon);
-Icon.register({
+export default {
     segment: {
         width: 500,
         height: 500,
@@ -285,4 +281,4 @@ Icon.register({
             }
         ]
     }
-});
+};

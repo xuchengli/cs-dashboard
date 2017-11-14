@@ -5,6 +5,7 @@ import Register from "./components/register.vue";
 import Header from "./components/header.vue";
 import Videos from "./components/videos.vue";
 import Workbench from "./components/workbench.vue";
+import Toolkit from "./components/toolkit.vue";
 import APIList from "./components/api-list.vue";
 import VideoPlayer from "./components/video-player.vue";
 
@@ -28,6 +29,7 @@ const router = new VueRouter({
                     path: "",
                     components: {
                         "default": Header,
+                        "toolkit": Toolkit,
                         "api-list": APIList,
                         "video-player": VideoPlayer
                     }
