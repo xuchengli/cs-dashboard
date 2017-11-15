@@ -121,7 +121,7 @@ class video {
     deleteStream(id) {
         return new Promise((resolve, reject) => {
             axios.delete(config.Video_Stream_API, {
-                id: id
+                data: { id: id }
             }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }

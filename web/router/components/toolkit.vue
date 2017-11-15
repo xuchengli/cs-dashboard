@@ -30,8 +30,9 @@
 </i18n>
 <template>
     <div class="uk-flex uk-flex-wrap uk-flex-wrap-around">
-        <div class="uk-width-1-6 tool" v-for="tool of tools"
-            uk-tooltip :title="$t(tool.name)">
+        <div class="uk-width-1-6 tool" :class="{ 'tool-active': tool.active }"
+            v-for="tool of tools" uk-tooltip :title="$t(tool.name)"
+            @click="select(tool.name)">
             <icon :name="tool.name"></icon>
         </div>
     </div>
@@ -55,6 +56,20 @@
                 tools: tools
             };
         },
+        methods: {
+            select(toolName) {
+                let selected = this.tools.find(tool => tool.active);
+                if (selected) {
+                    selected.active = false;
+                    if (selected.name === toolName) {
+                        this.$emit("select", "");
+                        return;
+                    }
+                }
+                this.tools.find(tool => tool.name === toolName).active = true;
+                this.$emit("select", toolName);
+            }
+        },
         components: {
             Icon
         }
@@ -67,8 +82,13 @@
         width: 28px;
         height: 28px;
     }
-    .tool:hover {
+    .tool:hover:not(.tool-active) {
         border: 1px solid #bbb;
         border-radius: 3px;
+    }
+    .tool-active {
+        border: 1px solid #bbb;
+        border-radius: 3px;
+        background-color: #f2f2f2;
     }
 </style>

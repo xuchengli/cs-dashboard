@@ -13,12 +13,15 @@
     import Map from "ol/map";
     import View from "ol/view";
     import Projection from "ol/proj/projection";
-    import Control from "ol/control";
+    import Interaction from "ol/interaction";
     import ImageLayer from "ol/layer/image";
     import ImageCanvas from "ol/source/imagecanvas";
+    import VectorLayer from "ol/layer/vector";
+    import VectorSource from "ol/source/vector";
+    import Draw from "ol/interaction/draw";
 
     export default {
-        props: ["src"],
+        props: ["src", "handle"],
         data() {
             return {
                 loading: false,
@@ -28,7 +31,9 @@
                 context: null,
                 center: [0, 0],
                 dx: 0,
-                dy: 0
+                dy: 0,
+                vectorSource: null,
+                interactions: []
             }
         },
         mounted() {
@@ -62,12 +67,55 @@
                                 resolutions: [1]
                             })
                         });
+                        this.vectorSource = new VectorSource({
+                            wrapX: false
+                        });
                         this.map.addLayer(videoLayer);
+                        this.map.addLayer(new VectorLayer({ source: this.vectorSource }));
                         this.loading = false;
                     } else {
                         this.context.putImageData(this.video.destination.imageData, this.dx, this.dy);
                         this.map.render();
                     }
+                }
+            },
+            handle: function(h) {
+                while (this.interactions.length) {
+                    this.map.removeInteraction(this.interactions.pop());
+                }
+                let draw;
+                switch(h) {
+                    case "point":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "Point"
+                        });
+                        break;
+                    case "segment":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "LineString",
+                            maxPoints: 2
+                        });
+                        break;
+                    case "path":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "LineString",
+                            freehandCondition: () => false
+                        });
+                        break;
+                    case "curve":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "LineString",
+                            freehand: true
+                        });
+                        break;
+                }
+                if (draw) {
+                    this.interactions.push(draw);
+                    this.map.addInteraction(draw);
                 }
             }
         },
@@ -83,7 +131,13 @@
                     target: "video-canvas",
                     pixelRatio: 1,
                     layers: [],
-                    controls: Control.defaults({ zoom: false }),
+                    controls: [],
+                    interactions: Interaction.defaults({
+                        altShiftDragRotate: false,
+                        keyboard: false,
+                        shiftDragZoom: false,
+                        pinchRotate: false
+                    }),
                     logo: false,
                     view: new View({
                         projection: new Projection({
