@@ -18,6 +18,10 @@
     import ImageCanvas from "ol/source/imagecanvas";
     import VectorLayer from "ol/layer/vector";
     import VectorSource from "ol/source/vector";
+    import Style from "ol/style/style";
+    import Fill from "ol/style/fill";
+    import Stroke from "ol/style/stroke";
+    import Circle from "ol/style/circle";
     import Draw from "ol/interaction/draw";
 
     export default {
@@ -71,7 +75,20 @@
                             wrapX: false
                         });
                         this.map.addLayer(videoLayer);
-                        this.map.addLayer(new VectorLayer({ source: this.vectorSource }));
+                        this.map.addLayer(new VectorLayer({
+                            source: this.vectorSource,
+                            style: new Style({
+                                fill: new Fill({ color: "rgba(255, 255, 255, 0.2)" }),
+                                stroke: new Stroke({
+                                    color: "#3399cc",
+                                    width: 3
+                                }),
+                                image: new Circle({
+                                    radius: 7,
+                                    fill: new Fill({ color: "#3399cc" })
+                                })
+                            })
+                        }));
                         this.loading = false;
                     } else {
                         this.context.putImageData(this.video.destination.imageData, this.dx, this.dy);
@@ -83,7 +100,7 @@
                 while (this.interactions.length) {
                     this.map.removeInteraction(this.interactions.pop());
                 }
-                let draw;
+                let draw = null;
                 switch(h) {
                     case "point":
                         draw = new Draw({
@@ -110,6 +127,33 @@
                             source: this.vectorSource,
                             type: "LineString",
                             freehand: true
+                        });
+                        break;
+                    case "square":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "Circle",
+                            geometryFunction: Draw.createRegularPolygon(4)
+                        });
+                        break;
+                    case "rectangle":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "Circle",
+                            geometryFunction: Draw.createBox()
+                        });
+                        break;
+                    case "triangle":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "Circle",
+                            geometryFunction: Draw.createRegularPolygon(3)
+                        });
+                        break;
+                    case "circle":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "Circle"
                         });
                         break;
                 }
