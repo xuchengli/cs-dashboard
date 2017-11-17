@@ -23,6 +23,7 @@
     import Stroke from "ol/style/stroke";
     import Circle from "ol/style/circle";
     import Draw from "ol/interaction/draw";
+    import Polygon from "ol/geom/polygon";
 
     export default {
         props: ["src", "handle"],
@@ -153,11 +154,60 @@
                     case "circle":
                         draw = new Draw({
                             source: this.vectorSource,
-                            type: "Circle"
+                            type: "Circle",
+                            geometryFunction: Draw.createRegularPolygon(60)
+                        });
+                        break;
+                    case "ellipse":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "Circle",
+                            geometryFunction: (coordinates, geometry) => {
+                                if (!geometry) geometry = new Polygon(null);
+                                let center = coordinates[0];
+                                let last = coordinates[1];
+                                let dx = center[0] - last[0];
+                                let dy = center[1] - last[1];
+                                var rotation = Math.atan2(dy, dx);
+                                let radius1 = Math.sqrt(dx * dx + dy * dy);
+                                let radius2 = radius1 / 2;
+                                let newCoordinates = [];
+                                let numPoints = 60;
+                                for (let i=0; i<numPoints; i++) {
+                                    let angle = i * 2 * Math.PI / numPoints;
+                                    let cosAngle = Math.cos(angle);
+                                    let offsetX = radius1 * cosAngle;
+                                    let offsetY = radius2 * Math.sqrt(1 - cosAngle * cosAngle);
+                                    if (angle > Math.PI) offsetY *= -1;
+                                    newCoordinates.push([center[0] + offsetX, center[1] + offsetY]);
+                                }
+                                newCoordinates.push(newCoordinates[0].slice());
+                                geometry.setCoordinates([newCoordinates]);
+                                geometry.rotate(rotation, center);
+                                return geometry;
+                            }
+                        });
+                        break;
+                    case "polygon":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "Polygon",
+                            freehandCondition: () => false
+                        });
+                        break;
+                    case "curveSurface":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "Polygon",
+                            freehand: true
                         });
                         break;
                 }
                 if (draw) {
+                    draw.on("drawend", evt => {
+                        console.info(evt.feature.getGeometry().getType());
+                        console.log(evt.feature.getGeometry().getCoordinates());
+                    });
                     this.interactions.push(draw);
                     this.map.addInteraction(draw);
                 }
