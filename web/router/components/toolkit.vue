@@ -10,6 +10,10 @@
             "triangle": "Triangle",
             "circle": "Circle",
             "ellipse": "Ellipse",
+            "pentagon": "Pentagon",
+            "hexagon": "Hexagon",
+            "star": "Star",
+            "explosion": "Explosion",
             "polygon": "Polygon",
             "curveSurface": "Curve surface"
         },
@@ -23,6 +27,10 @@
             "triangle": "三角形",
             "circle": "圆形",
             "ellipse": "椭圆形",
+            "pentagon": "五边形",
+            "hexagon": "六边形",
+            "star": "五角星",
+            "explosion": "爆炸形",
             "polygon": "多边形",
             "curveSurface": "曲平面"
         }
@@ -33,7 +41,7 @@
         <div class="uk-width-1-6 tool" :class="{ 'tool-active': tool.active }"
             v-for="tool of tools" uk-tooltip :title="$t(tool.name)"
             @click="select(tool.name)">
-            <icon :name="tool.name"></icon>
+            <icon :name="tool.name" :scale="tool.scale"></icon>
         </div>
     </div>
 </template>
@@ -49,6 +57,7 @@
             for (let icon in icons) {
                 tools.push({
                     name: icon,
+                    scale: icons[icon].scale || 1,
                     active: false
                 });
             }

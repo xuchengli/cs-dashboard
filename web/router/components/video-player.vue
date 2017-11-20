@@ -168,7 +168,7 @@
                                 let last = coordinates[1];
                                 let dx = center[0] - last[0];
                                 let dy = center[1] - last[1];
-                                var rotation = Math.atan2(dy, dx);
+                                let rotation = Math.atan2(dy, dx);
                                 let radius1 = Math.sqrt(dx * dx + dy * dy);
                                 let radius2 = radius1 / 2;
                                 let newCoordinates = [];
@@ -185,6 +185,38 @@
                                 geometry.setCoordinates([newCoordinates]);
                                 geometry.rotate(rotation, center);
                                 return geometry;
+                            }
+                        });
+                        break;
+                    case "pentagon":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "Circle",
+                            geometryFunction: Draw.createRegularPolygon(5)
+                        });
+                        break;
+                    case "hexagon":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "Circle",
+                            geometryFunction: Draw.createRegularPolygon(6)
+                        });
+                        break;
+                    case "star":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "Circle",
+                            geometryFunction: (coordinates, geometry) => {
+                                return this.createStar(coordinates, geometry, 10);
+                            }
+                        });
+                        break;
+                    case "explosion":
+                        draw = new Draw({
+                            source: this.vectorSource,
+                            type: "Circle",
+                            geometryFunction: (coordinates, geometry) => {
+                                return this.createStar(coordinates, geometry, 16);
                             }
                         });
                         break;
@@ -215,12 +247,12 @@
         },
         methods: {
             init() {
-                this.loading = true;
-                this.player = new JSMpeg.Player(this.src, {
-                    disableGl: true,
-                    silence: true
-                });
-                this.video = this.player.video;
+                // this.loading = true;
+                // this.player = new JSMpeg.Player(this.src, {
+                //     disableGl: true,
+                //     silence: true
+                // });
+                // this.video = this.player.video;
                 this.map = new Map({
                     target: "video-canvas",
                     pixelRatio: 1,
@@ -242,6 +274,46 @@
                         resolution: 1
                     })
                 });
+                /**
+                 * 调试绘图
+                **/
+                this.vectorSource = new VectorSource({
+                    wrapX: false
+                });
+                this.map.addLayer(new VectorLayer({
+                    source: this.vectorSource,
+                    style: new Style({
+                        fill: new Fill({ color: "rgba(255, 255, 255, 0.2)" }),
+                        stroke: new Stroke({
+                            color: "#3399cc",
+                            width: 3
+                        }),
+                        image: new Circle({
+                            radius: 7,
+                            fill: new Fill({ color: "#3399cc" })
+                        })
+                    })
+                }));
+            },
+            createStar(coordinates, geometry, points) {
+                if (!geometry) geometry = new Polygon(null);
+                let center = coordinates[0];
+                let last = coordinates[1];
+                let dx = center[0] - last[0];
+                let dy = center[1] - last[1];
+                let radius = Math.sqrt(dx * dx + dy * dy);
+                let rotation = Math.atan2(dy, dx);
+                let newCoordinates = [];
+                for (let i=0; i<points; i++) {
+                    let angle = rotation + i * 2 * Math.PI / points;
+                    let fraction = i % 2 === 0 ? 1 : 0.5;
+                    let offsetX = radius * fraction * Math.cos(angle);
+                    let offsetY = radius * fraction * Math.sin(angle);
+                    newCoordinates.push([center[0] + offsetX, center[1] + offsetY]);
+                }
+                newCoordinates.push(newCoordinates[0].slice());
+                geometry.setCoordinates([newCoordinates]);
+                return geometry;
             }
         },
         beforeRouteLeave(to, from, next) {
