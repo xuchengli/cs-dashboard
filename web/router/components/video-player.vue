@@ -23,6 +23,9 @@
     import Stroke from "ol/style/stroke";
     import Circle from "ol/style/circle";
     import Draw from "ol/interaction/draw";
+    import Select from "ol/interaction/select";
+    import DragBox from "ol/interaction/dragbox";
+    import Translate from "ol/interaction/translate";
     import Polygon from "ol/geom/polygon";
 
     export default {
@@ -101,7 +104,7 @@
                 while (this.interactions.length) {
                     this.map.removeInteraction(this.interactions.pop());
                 }
-                let draw = null;
+                let draw = null, select = null, dragBox = null, translate = null;
                 switch(h) {
                     case "point":
                         draw = new Draw({
@@ -234,6 +237,28 @@
                             freehand: true
                         });
                         break;
+                    case "translate":
+                        select = new Select();
+                        this.interactions.push(select);
+                        this.map.addInteraction(select);
+
+                        let selectedFeatures = select.getFeatures();
+
+                        dragBox = new DragBox();
+                        this.interactions.push(dragBox);
+                        this.map.addInteraction(dragBox);
+                        dragBox.on("boxstart", () => { selectedFeatures.clear(); });
+                        dragBox.on("boxend", () => {
+                            let extent = dragBox.getGeometry().getExtent();
+                            this.vectorSource.forEachFeatureIntersectingExtent(extent, feature => {
+                                selectedFeatures.push(feature);
+                            });
+                        });
+
+                        translate = new Translate({ features: selectedFeatures });
+                        this.interactions.push(translate);
+                        this.map.addInteraction(translate);
+                        break;
                 }
                 if (draw) {
                     draw.on("drawend", evt => {
@@ -247,12 +272,12 @@
         },
         methods: {
             init() {
-                // this.loading = true;
-                // this.player = new JSMpeg.Player(this.src, {
-                //     disableGl: true,
-                //     silence: true
-                // });
-                // this.video = this.player.video;
+                this.loading = true;
+                this.player = new JSMpeg.Player(this.src, {
+                    disableGl: true,
+                    silence: true
+                });
+                this.video = this.player.video;
                 this.map = new Map({
                     target: "video-canvas",
                     pixelRatio: 1,
@@ -274,26 +299,6 @@
                         resolution: 1
                     })
                 });
-                /**
-                 * 调试绘图
-                **/
-                this.vectorSource = new VectorSource({
-                    wrapX: false
-                });
-                this.map.addLayer(new VectorLayer({
-                    source: this.vectorSource,
-                    style: new Style({
-                        fill: new Fill({ color: "rgba(255, 255, 255, 0.2)" }),
-                        stroke: new Stroke({
-                            color: "#3399cc",
-                            width: 3
-                        }),
-                        image: new Circle({
-                            radius: 7,
-                            fill: new Fill({ color: "#3399cc" })
-                        })
-                    })
-                }));
             },
             createStar(coordinates, geometry, points) {
                 if (!geometry) geometry = new Polygon(null);

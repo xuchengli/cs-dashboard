@@ -1,5 +1,6 @@
 export default {
     point: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -28,6 +29,7 @@ export default {
         ]
     },
     segment: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -59,6 +61,7 @@ export default {
         ]
     },
     path: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -116,6 +119,7 @@ export default {
         ]
     },
     curve: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -157,6 +161,7 @@ export default {
         ]
     },
     square: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -172,6 +177,7 @@ export default {
         ]
     },
     rectangle: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -187,6 +193,7 @@ export default {
         ]
     },
     triangle: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -206,6 +213,7 @@ export default {
         ]
     },
     circle: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -229,6 +237,7 @@ export default {
         ]
     },
     ellipse: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -253,6 +262,7 @@ export default {
         ]
     },
     pentagon: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -274,6 +284,7 @@ export default {
         ]
     },
     hexagon: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -295,6 +306,7 @@ export default {
         ]
     },
     star: {
+        type: "draw",
         width: 500,
         height: 500,
         scale: 1.15,
@@ -319,6 +331,7 @@ export default {
         ]
     },
     explosion: {
+        type: "draw",
         width: 500,
         height: 500,
         scale: 1.2,
@@ -345,6 +358,7 @@ export default {
         ]
     },
     polygon: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -360,6 +374,7 @@ export default {
         ]
     },
     curveSurface: {
+        type: "draw",
         width: 500,
         height: 500,
         paths: [
@@ -398,6 +413,35 @@ export default {
                     "C 160.438 151.697 139.193 141.694 139.193 141.694",
                 transform: "matrix(1, 0, 0, 1, 0, 7.105427357601002e-15)",
                 style: "stroke: rgb(102, 102, 120); fill: rgb(255, 255, 255); stroke-width: 37;"
+            }
+        ]
+    },
+    translate: {
+        type: "modify",
+        width: 500,
+        height: 500,
+        paths: [
+            {
+                d: "M 0 0 L 100 0 L 100 32.5 L 400 32.5 L 400 0 L 500 0 " +
+                    "L 500 100 L 467.5 100 L 467.5 400 L 500 400 L 500 500 " +
+                    "L 400 500 L 400 467.5 L 100 467.5 L 100 500 L 0 500 " +
+                    "L 0 400 L 32.5 400 L 32.5 100 L 0 100 Z M 100 100 L 67.5 100 " +
+                    "L 67.5 400 L 100 400 L 100 432.5 L 400 432.5 L 400 400 " +
+                    "L 432.5 400 L 432.5 100 L 400 100 L 400 67.5 L 100 67.5 Z " +
+                    "M 35 65 L 65 65 L 65 35 L 35 35 Z M 435 65 L 465 65 L 465 35 " +
+                    "L 435 35 Z M 35 465 L 65 465 L 65 435 L 35 435 Z M 435 465 " +
+                    "L 465 465 L 465 435 L 435 435 Z M 200 200 L 400 200 L 400 400 " +
+                    "L 200 400 Z M 235 365 L 365 365 L 365 235 L 235 235 Z",
+                transform: "matrix(1, 0, 0, 1, 0, 7.105427357601002e-15)"
+            },
+            {
+                d: "M 100 100 L 300 100 L 300 300 L 100 300 L 100 100 Z",
+                transform: "matrix(1, 0, 0, 1, 0, 7.105427357601002e-15)"
+            },
+            {
+                d: "M 135 135 L 265 135 L 265 265 L 135 265 L 135 135 Z",
+                transform: "matrix(1, 0, 0, 1, 0, 7.105427357601002e-15)",
+                style: "fill: rgb(255, 255, 255);"
             }
         ]
     }

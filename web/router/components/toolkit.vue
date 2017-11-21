@@ -1,6 +1,8 @@
 <i18n>
     {
         "en": {
+            "draw": "Draw",
+            "modify": "Modify",
             "point": "Point",
             "segment": "Line segment",
             "path": "Polyline",
@@ -15,9 +17,12 @@
             "star": "Star",
             "explosion": "Explosion",
             "polygon": "Polygon",
-            "curveSurface": "Curve surface"
+            "curveSurface": "Curve surface",
+            "translate": "Translate"
         },
         "zh-CN": {
+            "draw": "绘图",
+            "modify": "修图",
             "point": "点",
             "segment": "线段",
             "path": "折线",
@@ -32,18 +37,24 @@
             "star": "五角星",
             "explosion": "爆炸形",
             "polygon": "多边形",
-            "curveSurface": "曲平面"
+            "curveSurface": "曲平面",
+            "translate": "平移"
         }
     }
 </i18n>
 <template>
-    <div class="uk-flex uk-flex-wrap uk-flex-wrap-around">
-        <div class="uk-width-1-6 tool" :class="{ 'tool-active': tool.active }"
-            v-for="tool of tools" uk-tooltip :title="$t(tool.name)"
-            @click="select(tool.name)">
-            <icon :name="tool.name" :scale="tool.scale"></icon>
-        </div>
-    </div>
+    <form>
+        <fieldset class="toolkit-fieldset" v-for="(_tools, type) in toolMap">
+            <legend class="uk-text-meta">{{ $t(type) }}</legend>
+            <div class="uk-flex uk-flex-wrap uk-flex-wrap-around">
+                <div class="uk-width-1-6 tool" :class="{ 'tool-active': tool.active }"
+                    v-for="tool of _tools" uk-tooltip :title="$t(tool.name)"
+                    @click="select(tool.name)">
+                    <icon :name="tool.name" :scale="tool.scale"></icon>
+                </div>
+            </div>
+        </fieldset>
+    </form>
 </template>
 <script>
     import Icon from "vue-awesome/components/Icon.vue";
@@ -57,6 +68,7 @@
             for (let icon in icons) {
                 tools.push({
                     name: icon,
+                    type: icons[icon].type,
                     scale: icons[icon].scale || 1,
                     active: false
                 });
@@ -64,6 +76,14 @@
             return {
                 tools: tools
             };
+        },
+        computed: {
+            toolMap() {
+                return {
+                    "draw": this.tools.filter(tool => tool.type === "draw"),
+                    "modify": this.tools.filter(tool => tool.type === "modify")
+                };
+            }
         },
         methods: {
             select(toolName) {
@@ -85,6 +105,14 @@
     }
 </script>
 <style scoped>
+    .toolkit-fieldset {
+        border: 1px solid #e5e5e5;
+        border-radius: 3px;
+        margin: 10px 0;
+    }
+    .toolkit-fieldset:first-of-type {
+        margin-top: 0;
+    }
     .tool {
         cursor: pointer;
         text-align: center;
