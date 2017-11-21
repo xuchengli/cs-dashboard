@@ -18,7 +18,8 @@
             "explosion": "Explosion",
             "polygon": "Polygon",
             "curveSurface": "Curve surface",
-            "translate": "Translate"
+            "translate": "Translate",
+            "rotate": "Rotate"
         },
         "zh-CN": {
             "draw": "绘图",
@@ -38,7 +39,8 @@
             "explosion": "爆炸形",
             "polygon": "多边形",
             "curveSurface": "曲平面",
-            "translate": "平移"
+            "translate": "平移",
+            "rotate": "旋转"
         }
     }
 </i18n>
