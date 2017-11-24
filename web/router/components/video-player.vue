@@ -25,7 +25,7 @@
     import Draw from "ol/interaction/draw";
     import Select from "ol/interaction/select";
     import DragBox from "ol/interaction/dragbox";
-    import Translate from "ol/interaction/translate";
+    import Transform from "../../js/transform";
     import Polygon from "ol/geom/polygon";
 
     export default {
@@ -104,7 +104,7 @@
                 while (this.interactions.length) {
                     this.map.removeInteraction(this.interactions.pop());
                 }
-                let draw = null, select = null, dragBox = null, translate = null;
+                let draw = null, select = null, dragBox = null, transform = null;
                 switch(h) {
                     case "point":
                         draw = new Draw({
@@ -237,7 +237,7 @@
                             freehand: true
                         });
                         break;
-                    case "translate":
+                    case "transform":
                         select = new Select();
                         this.interactions.push(select);
                         this.map.addInteraction(select);
@@ -255,9 +255,9 @@
                             });
                         });
 
-                        translate = new Translate({ features: selectedFeatures });
-                        this.interactions.push(translate);
-                        this.map.addInteraction(translate);
+                        transform = new Transform(selectedFeatures);
+                        this.interactions.push(transform);
+                        this.map.addInteraction(transform);
                         break;
                 }
                 if (draw) {
