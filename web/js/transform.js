@@ -17,7 +17,7 @@ import CloseHandle from "../images/close-handle.svg";
 import RotationHandle from "../images/rotation-handle.svg";
 
 class Transform extends Pointer {
-    constructor(features) {
+    constructor(features = []) {
         super({
             handleDownEvent: Transform.prototype._handleDownEvent,
             handleDragEvent: Transform.prototype._handleDragEvent,
@@ -55,6 +55,23 @@ class Transform extends Pointer {
         this._rotateHandle = { geometry: new Point([]) };
         this._deleteHandle = { geometry: new Point([]) };
         /**
+         * 拉伸操作柄元素的图案是蓝色正方形
+         * @private
+         */
+        this._scaleImage = new RegularShape({
+            fill: new Fill({ color: "#00f" }),
+            points: 4,
+            radius: 10,
+            angle: Math.PI / 4,
+            stroke: new Stroke({ color: "#fff", width: 1 })
+        });
+        /**
+         * 旋转和删除操作柄元素的图案设置成相应的svg图标
+         * @private
+         */
+        this._rotateImage = new Icon({ src: RotationHandle });
+        this._deleteImage = new Icon({ src: CloseHandle });
+        /**
          * 根据八个拉伸操作柄坐标构建八个操作柄元素.
          * @private
          */
@@ -66,17 +83,13 @@ class Transform extends Pointer {
          * @private
          */
         this._rotateHandle.feature = new Feature(this._rotateHandle.geometry);
-        this._rotateHandle.feature.setStyle(new Style({
-            image: new Icon({ src: RotationHandle })
-        }));
+        this._rotateHandle.feature.setStyle(new Style({ image: this._rotateImage }));
         /**
          * 根据删除操作柄坐标构建删除操作柄元素，元素风格使用删除图标.
          * @private
          */
         this._deleteHandle.feature = new Feature(this._deleteHandle.geometry);
-        this._deleteHandle.feature.setStyle(new Style({
-            image: new Icon({ src: CloseHandle })
-        }));
+        this._deleteHandle.feature.setStyle(new Style({ image: this._deleteImage }));
         /**
          * 拉伸，旋转，删除操作柄所在图层，
          * 默认操作柄元素的风格是蓝色正方形，适用于拉伸操作柄，旋转和删除操作柄风格使用单独的图标.
@@ -98,29 +111,13 @@ class Transform extends Pointer {
                 ],
                 useSpatialIndex: false
             }),
-            style: new Style({
-                image: new RegularShape({
-                    fill: new Fill({ color: "#00f" }),
-                    points: 4,
-                    radius: 10,
-                    angle: Math.PI / 4,
-                    stroke: new Stroke({ color: "#fff", width: 1 })
-                })
-            })
+            style: new Style({ image: this._scaleImage })
         });
         /**
          * 添加，删除被操作元素，都会重新绘制十个操作柄的位置.
          */
-        features.on(["add", "remove"], () => {
-            this._setSketch();
-            let coordinates = features.getArray()
-                                .map(feature => feature.getGeometry().getFlatCoordinates())
-                                .reduce((acc, cur) => acc.concat(cur), []);
-            if (coordinates.length > 2) {
-                let extent = Extent.createOrUpdateFromFlatCoordinates(
-                    coordinates, 0, coordinates.length, 2);
-                this._setSketch(extent);
-            }
+        this._features.on(["add", "remove"], () => {
+            this._setSketch(this._featuresExtent());
         });
         /**
          * 最近一次鼠标点击的坐标位置.
@@ -134,6 +131,12 @@ class Transform extends Pointer {
          * @private
          */
         this._lastFeature = null;
+        /**
+         * 操作柄的中心位置
+         * @type {ol.Coordinate}
+         * @private
+         */
+        this._sketchCentre = null;
         Events.listen(this, Obj.getChangeEventType(InteractionProperty.ACTIVE),
                         this._updateState, this);
     }
@@ -247,6 +250,28 @@ class Transform extends Pointer {
                             );
                         });
                         break;
+                    case this._deleteHandle.feature:
+                        break;
+                    case this._rotateHandle.feature:
+                        let lastAngle = Math.atan2(
+                            this._lastCoordinate[1] - this._sketchCentre[1],
+                            this._lastCoordinate[0] - this._sketchCentre[0]
+                        );
+                        let newAngle = Math.atan2(
+                            newCoordinate[1] - this._sketchCentre[1],
+                            newCoordinate[0] - this._sketchCentre[0]
+                        );
+                        let deltaAngle = newAngle - lastAngle;
+                        geometries.forEach(geometry => {
+                            geometry.rotate(deltaAngle, this._sketchCentre);
+                        });
+                        this._scaleImage.setRotation(
+                            this._scaleImage.getRotation() - deltaAngle);
+                        this._rotateImage.setRotation(
+                            this._rotateImage.getRotation() - deltaAngle);
+                        this._deleteImage.setRotation(
+                            this._deleteImage.getRotation() - deltaAngle);
+                        break;
                 }
             }
             this._lastCoordinate = newCoordinate;
@@ -295,6 +320,10 @@ class Transform extends Pointer {
             this._lastCoordinate = null;
             this._lastFeature = null;
             this._handleMoveEvent(event);
+            /**
+             * 每次平移，拉伸，旋转后都重新计算操作柄中心位置.
+             */
+            this._sketchCentre = Extent.getCenter(this._featuresExtent());
         }
         return false;
     }
@@ -345,6 +374,10 @@ class Transform extends Pointer {
                 [tr[0] + this._sketchDelta * 4, tr[1] + this._sketchDelta * 4],
                 [tr[0] + this._sketchDelta * 7, tr[1] + this._sketchDelta * 4]
             );
+            this._sketchCentre = Extent.getCenter(extent);
+            this._scaleImage.setRotation(0);
+            this._rotateImage.setRotation(0);
+            this._deleteImage.setRotation(0);
         } else {
             this._setCoordinates();
         }
@@ -357,6 +390,17 @@ class Transform extends Pointer {
                 return feature;
             }
         });
+    }
+    _featuresExtent() {
+        let extent = [];
+        let coordinates = this._features.getArray()
+                .map(feature => feature.getGeometry().getFlatCoordinates())
+                .reduce((acc, cur) => acc.concat(cur), []);
+        if (coordinates.length > 2) {
+            extent = Extent.createOrUpdateFromFlatCoordinates(
+                coordinates, 0, coordinates.length, 2);
+        }
+        return extent;
     }
 }
 export default Transform;
