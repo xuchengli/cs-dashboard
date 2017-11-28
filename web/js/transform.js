@@ -160,97 +160,59 @@ class Transform extends Pointer {
             if (this._features.getArray().includes(this._lastFeature)) {
                 geometries.forEach(geometry => { geometry.translate(deltaX, deltaY); });
             } else {
-                let prow = null, anchor = null;
+                let prow = null, anchor = null, sx = 1, sy = 1;
                 switch(this._lastFeature) {
                     case this._scaleHandle.tl.feature:
                         prow = this._scaleHandle.tl.geometry.getCoordinates();
                         anchor = this._scaleHandle.br.geometry.getCoordinates();
-                        geometries.forEach(geometry => {
-                            geometry.scale(
-                                1 - deltaX / (anchor[0] - prow[0]),
-                                1 + deltaY / (prow[1] - anchor[1]),
-                                anchor
-                            );
-                        });
+                        if (prow[0] !== anchor[0]) sx = 1 - deltaX / (anchor[0] - prow[0]);
+                        if (prow[1] !== anchor[1]) sy = 1 + deltaY / (prow[1] - anchor[1]);
+                        geometries.forEach(geometry => { geometry.scale(sx, sy, anchor); });
                         break;
                     case this._scaleHandle.t.feature:
                         prow = this._scaleHandle.t.geometry.getCoordinates();
                         anchor = this._scaleHandle.b.geometry.getCoordinates();
-                        geometries.forEach(geometry => {
-                            geometry.scale(
-                                1,
-                                1 + deltaY / (prow[1] - anchor[1]),
-                                anchor
-                            );
-                        });
+                        if (prow[1] !== anchor[1]) sy = 1 + deltaY / (prow[1] - anchor[1]);
+                        geometries.forEach(geometry => { geometry.scale(sx, sy, anchor); });
                         break;
                     case this._scaleHandle.tr.feature:
                         prow = this._scaleHandle.tr.geometry.getCoordinates();
                         anchor = this._scaleHandle.bl.geometry.getCoordinates();
-                        geometries.forEach(geometry => {
-                            geometry.scale(
-                                1 + deltaX / (prow[0] - anchor[0]),
-                                1 + deltaY / (prow[1] - anchor[1]),
-                                anchor
-                            );
-                        });
+                        if (prow[0] !== anchor[0]) sx = 1 + deltaX / (prow[0] - anchor[0]);
+                        if (prow[1] !== anchor[1]) sy = 1 + deltaY / (prow[1] - anchor[1]);
+                        geometries.forEach(geometry => { geometry.scale(sx, sy, anchor); });
                         break;
                     case this._scaleHandle.l.feature:
                         prow = this._scaleHandle.l.geometry.getCoordinates();
                         anchor = this._scaleHandle.r.geometry.getCoordinates();
-                        geometries.forEach(geometry => {
-                            geometry.scale(
-                                1 - deltaX / (anchor[0] - prow[0]),
-                                1,
-                                anchor
-                            );
-                        });
+                        if (prow[0] !== anchor[0]) sx = 1 - deltaX / (anchor[0] - prow[0]);
+                        geometries.forEach(geometry => { geometry.scale(sx, sy, anchor); });
                         break;
                     case this._scaleHandle.r.feature:
                         prow = this._scaleHandle.r.geometry.getCoordinates();
                         anchor = this._scaleHandle.l.geometry.getCoordinates();
-                        geometries.forEach(geometry => {
-                            geometry.scale(
-                                1 + deltaX / (prow[0] - anchor[0]),
-                                1,
-                                anchor
-                            );
-                        });
+                        if (prow[0] !== anchor[0]) sx = 1 + deltaX / (prow[0] - anchor[0]);
+                        geometries.forEach(geometry => { geometry.scale(sx, sy, anchor); });
                         break;
                     case this._scaleHandle.bl.feature:
                         prow = this._scaleHandle.bl.geometry.getCoordinates();
                         anchor = this._scaleHandle.tr.geometry.getCoordinates();
-                        geometries.forEach(geometry => {
-                            geometry.scale(
-                                1 - deltaX / (anchor[0] - prow[0]),
-                                1 - deltaY / (anchor[1] - prow[1]),
-                                anchor
-                            );
-                        });
+                        if (prow[0] !== anchor[0]) sx = 1 - deltaX / (anchor[0] - prow[0]);
+                        if (prow[1] !== anchor[1]) sy = 1 - deltaY / (anchor[1] - prow[1]);
+                        geometries.forEach(geometry => { geometry.scale(sx, sy, anchor); });
                         break;
                     case this._scaleHandle.b.feature:
                         prow = this._scaleHandle.b.geometry.getCoordinates();
                         anchor = this._scaleHandle.t.geometry.getCoordinates();
-                        geometries.forEach(geometry => {
-                            geometry.scale(
-                                1,
-                                1 - deltaY / (anchor[1] - prow[1]),
-                                anchor
-                            );
-                        });
+                        if (prow[1] !== anchor[1]) sy = 1 - deltaY / (anchor[1] - prow[1]);
+                        geometries.forEach(geometry => { geometry.scale(sx, sy, anchor); });
                         break;
                     case this._scaleHandle.br.feature:
                         prow = this._scaleHandle.br.geometry.getCoordinates();
                         anchor = this._scaleHandle.tl.geometry.getCoordinates();
-                        geometries.forEach(geometry => {
-                            geometry.scale(
-                                1 + deltaX / (prow[0] - anchor[0]),
-                                1 - deltaY / (anchor[1] - prow[1]),
-                                anchor
-                            );
-                        });
-                        break;
-                    case this._deleteHandle.feature:
+                        if (prow[0] !== anchor[0]) sx = 1 + deltaX / (prow[0] - anchor[0]);
+                        if (prow[1] !== anchor[1]) sy = 1 - deltaY / (anchor[1] - prow[1]);
+                        geometries.forEach(geometry => { geometry.scale(sx, sy, anchor); });
                         break;
                     case this._rotateHandle.feature:
                         let lastAngle = Math.atan2(
