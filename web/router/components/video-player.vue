@@ -256,6 +256,11 @@
                         });
 
                         transform = new Transform(selectedFeatures);
+                        transform.on("delete", () => {
+                            while (selectedFeatures.getLength() > 0) {
+                                this.vectorSource.removeFeature(selectedFeatures.pop());
+                            }
+                        });
                         this.interactions.push(transform);
                         this.map.addInteraction(transform);
                         break;

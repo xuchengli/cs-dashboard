@@ -12,6 +12,7 @@ import Fill from "ol/style/fill";
 import Stroke from "ol/style/stroke";
 import RegularShape from "ol/style/regularshape";
 import Icon from "ol/style/icon";
+import Event from "ol/events/event";
 import RotationCursor from "../images/rotation-cursor.svg";
 import CloseHandle from "../images/close-handle.svg";
 import RotationHandle from "../images/rotation-handle.svg";
@@ -286,6 +287,9 @@ class Transform extends Pointer {
              * 每次平移，拉伸，旋转后都重新计算操作柄中心位置.
              */
             this._sketchCentre = Extent.getCenter(this._featuresExtent());
+            if (this._featuresAtPixel(event.pixel, event.map) === this._deleteHandle.feature) {
+                this.dispatchEvent(new Event("delete"));
+            }
         }
         return false;
     }
