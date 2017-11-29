@@ -1,0 +1,23 @@
+version: "3"
+services:
+  dashboard:
+    build: .
+    image: cognitive-solution-dashboard
+    container_name: cs-dashboard
+    environment:
+      - AI_VISION_API=${AI_VISION_API:-http://9.186.106.213:9080/powerai-vision/api}
+      - Video_Stream_API=${Video_Stream_API:-http://9.186.106.213:8083/demo_video/stream}
+      - MongoDB_URI=${MongoDB_URI:-mongodb://dashboard_mongo:27017/cognitive_solution}
+    links:
+      - mongodb:dashboard_mongo
+    ports:
+      - "8084:8080"
+    volumes:
+      - /data/upload:/usr/app/src/upload
+  mongodb:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - /data/db:/data/db
