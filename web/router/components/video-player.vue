@@ -25,6 +25,8 @@
     import Draw from "ol/interaction/draw";
     import Select from "ol/interaction/select";
     import DragBox from "ol/interaction/dragbox";
+    import Snap from "ol/interaction/snap";
+    import Modify from "ol/interaction/modify";
     import Transform from "../../js/transform";
     import Polygon from "ol/geom/polygon";
 
@@ -104,7 +106,8 @@
                 while (this.interactions.length) {
                     this.map.removeInteraction(this.interactions.pop());
                 }
-                let draw = null, select = null, dragBox = null, transform = null;
+                let draw = null, select = null, dragBox = null, transform = null,
+                    snap = null, modify = null;
                 switch(h) {
                     case "point":
                         draw = new Draw({
@@ -263,6 +266,15 @@
                         });
                         this.interactions.push(transform);
                         this.map.addInteraction(transform);
+                        break;
+                    case "modify":
+                        modify = new Modify({ source: this.vectorSource });
+                        this.interactions.push(modify);
+                        this.map.addInteraction(modify);
+
+                        snap = new Snap({ source: this.vectorSource });
+                        this.interactions.push(snap);
+                        this.map.addInteraction(snap);
                         break;
                 }
                 if (draw) {
