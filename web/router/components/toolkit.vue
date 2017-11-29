@@ -16,7 +16,8 @@
             "explosion": "Explosion",
             "polygon": "Polygon",
             "curveSurface": "Curve surface",
-            "transform": "Transform"
+            "transform": "Transform",
+            "modify": "Modify"
         },
         "zh-CN": {
             "point": "点",
@@ -34,7 +35,8 @@
             "explosion": "爆炸形",
             "polygon": "多边形",
             "curveSurface": "曲平面",
-            "transform": "编辑"
+            "transform": "编辑",
+            "modify": "变形"
         }
     }
 </i18n>
