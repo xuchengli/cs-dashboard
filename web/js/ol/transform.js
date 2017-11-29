@@ -13,9 +13,9 @@ import Stroke from "ol/style/stroke";
 import RegularShape from "ol/style/regularshape";
 import Icon from "ol/style/icon";
 import Event from "ol/events/event";
-import RotationCursor from "../images/rotation-cursor.svg";
-import CloseHandle from "../images/close-handle.svg";
-import RotationHandle from "../images/rotation-handle.svg";
+import RotationCursor from "../../images/rotation-cursor.svg";
+import CloseHandle from "../../images/close-handle.svg";
+import RotationHandle from "../../images/rotation-handle.svg";
 
 class Transform extends Pointer {
     constructor(features = []) {

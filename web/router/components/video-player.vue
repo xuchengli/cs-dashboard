@@ -1,3 +1,13 @@
+<i18n>
+    {
+        "en": {
+            "total": "Total: "
+        },
+        "zh-CN": {
+            "total": "总共："
+        }
+    }
+</i18n>
 <template>
     <div class="player">
         <div id="video-canvas" class="uk-width-1-1 uk-height-1-1"></div>
@@ -27,8 +37,9 @@
     import DragBox from "ol/interaction/dragbox";
     import Snap from "ol/interaction/snap";
     import Modify from "ol/interaction/modify";
-    import Transform from "../../js/transform";
     import Polygon from "ol/geom/polygon";
+    import Transform from "../../js/ol/transform";
+    import LabelControl from "../../js/ol/control/label";
 
     export default {
         props: ["src", "handle"],
@@ -43,7 +54,10 @@
                 dx: 0,
                 dy: 0,
                 vectorSource: null,
-                interactions: []
+                interactions: [],
+                control: {
+                    label: new LabelControl()
+                }
             }
         },
         mounted() {
@@ -79,6 +93,14 @@
                         });
                         this.vectorSource = new VectorSource({
                             wrapX: false
+                        });
+                        this.vectorSource.on(["addfeature", "removefeature", "clear"], () => {
+                            let total = this.vectorSource.getFeatures().length;
+                            if (total > 0) {
+                                this.control.label.setContent(this.$t("total") + total);
+                            } else {
+                                this.control.label.setContent("");
+                            }
                         });
                         this.map.addLayer(videoLayer);
                         this.map.addLayer(new VectorLayer({
@@ -299,7 +321,7 @@
                     target: "video-canvas",
                     pixelRatio: 1,
                     layers: [],
-                    controls: [],
+                    controls: [this.control.label],
                     interactions: Interaction.defaults({
                         altShiftDragRotate: false,
                         keyboard: false,
