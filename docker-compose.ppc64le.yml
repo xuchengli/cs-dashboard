@@ -15,9 +15,7 @@ services:
     volumes:
       - /data/upload:/usr/app/src/upload
   mongodb:
-    image: mongo
+    image: ppc64le/mongodb:2.6.10
     container_name: mongo
-    ports:
-      - "27017:27017"
     volumes:
       - /data/db:/data/db
