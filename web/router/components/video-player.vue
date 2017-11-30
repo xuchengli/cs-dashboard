@@ -1,24 +1,32 @@
 <i18n>
     {
         "en": {
-            "total": "Total: "
+            "total": "Total: {total}",
+            "selected": "Selected: {selected}"
         },
         "zh-CN": {
-            "total": "总共："
+            "total": "总数: {total}",
+            "selected": "选中: {selected}"
         }
     }
 </i18n>
 <template>
     <div class="player">
         <div id="video-canvas" class="uk-width-1-1 uk-height-1-1"></div>
+        <div class="uk-position-small uk-position-top-right">
+            <span class="uk-label" v-if="totalFeatures">
+                {{ $t("total", { total: totalFeatures }) }}
+            </span>
+            <span class="uk-label uk-label-success uk-margin-small-left" v-if="selectedFeatures">
+                {{ $t("selected", { selected: selectedFeatures }) }}
+            </span>
+        </div>
         <div class="uk-flex overlayer" v-if="loading">
             <div class="uk-margin-auto uk-margin-auto-vertical" uk-spinner></div>
         </div>
     </div>
 </template>
 <script>
-    import UIkit from "uikit";
-    import axios from "axios";
     import JSMpeg from "@lixuc/jsmpeg";
     import Map from "ol/map";
     import View from "ol/view";
@@ -39,7 +47,6 @@
     import Modify from "ol/interaction/modify";
     import Polygon from "ol/geom/polygon";
     import Transform from "../../js/ol/transform";
-    import LabelControl from "../../js/ol/control/label";
 
     export default {
         props: ["src", "handle"],
@@ -55,9 +62,18 @@
                 dy: 0,
                 vectorSource: null,
                 interactions: [],
-                control: {
-                    label: new LabelControl()
-                }
+                selectedFeaturesCollection: null
+            }
+        },
+        computed: {
+            totalFeatures() {
+                return this.vectorSource ? this.vectorSource.getFeatures().length : 0;
+            },
+            selectInteraction() {
+                return this.interactions.find(interaction => interaction instanceof Select);
+            },
+            selectedFeatures() {
+                return this.selectInteraction ? this.selectedFeaturesCollection.getLength() : 0;
             }
         },
         mounted() {
@@ -93,14 +109,6 @@
                         });
                         this.vectorSource = new VectorSource({
                             wrapX: false
-                        });
-                        this.vectorSource.on(["addfeature", "removefeature", "clear"], () => {
-                            let total = this.vectorSource.getFeatures().length;
-                            if (total > 0) {
-                                this.control.label.setContent(this.$t("total") + total);
-                            } else {
-                                this.control.label.setContent("");
-                            }
                         });
                         this.map.addLayer(videoLayer);
                         this.map.addLayer(new VectorLayer({
@@ -267,23 +275,23 @@
                         this.interactions.push(select);
                         this.map.addInteraction(select);
 
-                        let selectedFeatures = select.getFeatures();
+                        this.selectedFeaturesCollection = select.getFeatures();
 
                         dragBox = new DragBox();
                         this.interactions.push(dragBox);
                         this.map.addInteraction(dragBox);
-                        dragBox.on("boxstart", () => { selectedFeatures.clear(); });
+                        dragBox.on("boxstart", () => { this.selectedFeaturesCollection.clear(); });
                         dragBox.on("boxend", () => {
                             let extent = dragBox.getGeometry().getExtent();
                             this.vectorSource.forEachFeatureIntersectingExtent(extent, feature => {
-                                selectedFeatures.push(feature);
+                                this.selectedFeaturesCollection.push(feature);
                             });
                         });
 
-                        transform = new Transform(selectedFeatures);
+                        transform = new Transform(this.selectedFeaturesCollection);
                         transform.on("delete", () => {
-                            while (selectedFeatures.getLength() > 0) {
-                                this.vectorSource.removeFeature(selectedFeatures.pop());
+                            while (this.selectedFeaturesCollection.getLength() > 0) {
+                                this.vectorSource.removeFeature(this.selectedFeaturesCollection.pop());
                             }
                         });
                         this.interactions.push(transform);
@@ -321,7 +329,7 @@
                     target: "video-canvas",
                     pixelRatio: 1,
                     layers: [],
-                    controls: [this.control.label],
+                    controls: [],
                     interactions: Interaction.defaults({
                         altShiftDragRotate: false,
                         keyboard: false,
