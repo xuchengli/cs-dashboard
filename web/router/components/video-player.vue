@@ -321,6 +321,7 @@
             init() {
                 this.loading = true;
                 this.player = new JSMpeg.Player(this.src, {
+                    audio: false,
                     disableGl: true,
                     silence: true
                 });
