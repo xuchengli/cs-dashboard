@@ -43,10 +43,10 @@
             <div class="uk-flex uk-flex-wrap uk-flex-wrap-top uk-width-1-1"
                 uk-height-viewport="offset-top: true; offset-bottom: true" v-if="totalRow">
                 <div class="uk-box-shadow-small uk-box-shadow-hover-large
-                    uk-margin-left uk-margin-bottom uk-inline"
+                    uk-margin-left uk-margin-bottom uk-inline video"
                     v-for="video of currentPage"
                     @mouseenter="video.overlay = true;" @mouseleave="video.overlay = false;">
-                    <img :src="video.cover" class="video">
+                    <img :src="video.cover" class="uk-width-1-1 uk-height-1-1">
                     <div class="uk-position-center" v-if="video.overlay">
                         <a class="uk-icon-button" uk-icon="icon: pencil"
                             :class="{ 'uk-disabled': uploading }" uk-tooltip :title="$t('edit')"
