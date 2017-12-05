@@ -48,7 +48,7 @@
                     </div>
                 </div>
                 <div class="uk-card uk-card-default uk-margin-left uk-width-expand">
-                    <div class="uk-card-body uk-padding-remove">
+                    <div class="uk-card-body uk-padding-remove video-player-wrapper">
                         <router-view name="video-player" :src="video.stream_address" :handle="handle">
                         </router-view>
                     </div>
@@ -110,5 +110,8 @@
     }
     .uk-card-content-padding .uk-h4 {
         color: #666;
+    }
+    .video-player-wrapper {
+        height: 90%;
     }
 </style>
