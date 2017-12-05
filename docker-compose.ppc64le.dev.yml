@@ -1,0 +1,23 @@
+version: "2"
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.ppc64le
+    image: cognitive-solution-dashboard
+    container_name: cs-dashboard
+    environment:
+      - AI_VISION_API=http://9.186.106.206:9080/powerai-vision/api
+      - Video_Stream_API=http://9.186.106.206:8083/demo_video/stream
+      - MongoDB_URI=mongodb://dashboard_mongo:27017/cognitive_solution
+    links:
+      - mongodb:dashboard_mongo
+    ports:
+      - "8084:8080"
+    volumes:
+      - /data/upload:/usr/app/src/upload
+  mongodb:
+    image: ppc64le/mongodb:2.6.10
+    container_name: mongo
+    volumes:
+      - /data/db:/data/db
