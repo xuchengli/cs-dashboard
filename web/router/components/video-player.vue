@@ -27,7 +27,7 @@
     </div>
 </template>
 <script>
-    import JSMpeg from "@lixuc/jsmpeg";
+    import Player from "../../js/mpeg/player";
     import Map from "ol/map";
     import View from "ol/view";
     import Projection from "ol/proj/projection";
@@ -54,9 +54,7 @@
             return {
                 loading: false,
                 player: null,
-                video: null,
                 map: null,
-                context: null,
                 center: [0, 0],
                 dx: 0,
                 dy: 0,
@@ -81,57 +79,6 @@
         },
         watch: {
             "$route": "init",
-            "video.currentFrame": function(frame) {
-                if (frame > 0) {
-                    if (frame === 1) {
-                        let videoLayer = new ImageLayer({
-                            source: new ImageCanvas({
-                                canvasFunction: (extent, resolution, pixelRatio,
-                                    size, projection) => {
-                                    let center = this.map.getView().getCenter();
-                                    let canvas = document.createElement("canvas");
-                                    this.context = canvas.getContext("2d");
-                                    canvas.setAttribute("width", size[0]);
-                                    canvas.setAttribute("height", size[1]);
-
-                                    this.dx += this.center[0] - center[0];
-                                    this.dy += center[1] - this.center[1];
-
-                                    this.center = center;
-
-                                    this.context.putImageData(this.video.destination.imageData,
-                                        this.dx, this.dy);
-                                    return canvas;
-                                },
-                                ratio: 1,
-                                resolutions: [1]
-                            })
-                        });
-                        this.vectorSource = new VectorSource({
-                            wrapX: false
-                        });
-                        this.map.addLayer(videoLayer);
-                        this.map.addLayer(new VectorLayer({
-                            source: this.vectorSource,
-                            style: new Style({
-                                fill: new Fill({ color: "rgba(255, 255, 255, 0.2)" }),
-                                stroke: new Stroke({
-                                    color: "#3399cc",
-                                    width: 3
-                                }),
-                                image: new Circle({
-                                    radius: 7,
-                                    fill: new Fill({ color: "#3399cc" })
-                                })
-                            })
-                        }));
-                        this.loading = false;
-                    } else {
-                        this.context.putImageData(this.video.destination.imageData, this.dx, this.dy);
-                        this.map.render();
-                    }
-                }
-            },
             handle: function(h) {
                 while (this.interactions.length) {
                     this.map.removeInteraction(this.interactions.pop());
@@ -320,16 +267,58 @@
         methods: {
             init() {
                 this.loading = true;
-                this.player = new JSMpeg.Player(this.src, {
-                    audio: false,
-                    disableGl: true,
-                    silence: true
+                this.player = new Player(this.src);
+                this.player.renderer.canvas.addEventListener("progress", () => {
+                    this.map.render();
                 });
-                this.video = this.player.video;
+                this.player.renderer.canvas.addEventListener("play", () => {
+                    if (this.loading) this.loading = false;
+                    this.map.render();
+                });
+                this.vectorSource = new VectorSource({
+                    wrapX: false
+                });
                 this.map = new Map({
                     target: "video-canvas",
                     pixelRatio: 1,
-                    layers: [],
+                    layers: [
+                        new ImageLayer({
+                            source: new ImageCanvas({
+                                canvasFunction: (extent, resolution, pixelRatio,
+                                    size, projection) => {
+                                    let center = this.map.getView().getCenter();
+
+                                    this.dx += this.center[0] - center[0];
+                                    this.dy += center[1] - this.center[1];
+
+                                    this.center = center;
+
+                                    this.player.renderer.x = this.dx;
+                                    this.player.renderer.y = this.dy;
+                                    this.player.renderer.canvas.width = size[0];
+                                    this.player.renderer.canvas.height = size[1];
+
+                                    return this.player.renderer.canvas;
+                                },
+                                ratio: 1,
+                                resolutions: [1]
+                            })
+                        }),
+                        new VectorLayer({
+                            source: this.vectorSource,
+                            style: new Style({
+                                fill: new Fill({ color: "rgba(255, 255, 255, 0.2)" }),
+                                stroke: new Stroke({
+                                    color: "#3399cc",
+                                    width: 3
+                                }),
+                                image: new Circle({
+                                    radius: 7,
+                                    fill: new Fill({ color: "#3399cc" })
+                                })
+                            })
+                        })
+                    ],
                     controls: [],
                     interactions: Interaction.defaults({
                         altShiftDragRotate: false,
@@ -378,7 +367,7 @@
 <style scoped>
     .player {
         width: 100%;
-        height: 400px;
+        height: 100%;
     }
     .overlayer {
         position: absolute;

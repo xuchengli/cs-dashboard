@@ -68,10 +68,10 @@ class websocket {
     trickProgress() {
         if (this.progressTimeoutId) clearTimeout(this.progressTimeoutId);
         if (this.progress < 100) {
-            this.progress++;
+            this.progress = this.progress < 90 ? this.progress + 5 : this.progress + 1;
             this.progressTimeoutId = setTimeout(() => {
                 this.trickProgress();
-            }, this.progress * Math.round(500 * Math.random()));
+            }, this.progress * Math.round(200 * Math.random()));
         }
     }
 }

@@ -26,9 +26,9 @@ class videoCanvas {
     }
     renderProgress(progress) {
         this.context.fillStyle = "#222";
-        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.context.fillRect(this.x, this.y, this.canvas.width, this.canvas.height);
         this.context.fillStyle = "#fff";
-        this.context.fillRect(0, this.canvas.height * (1 - progress / 100),
+        this.context.fillRect(this.x, this.canvas.height * (1 - progress / 100),
             this.canvas.width, this.canvas.height * (progress / 100));
     }
     render(y, cb, cr) {
