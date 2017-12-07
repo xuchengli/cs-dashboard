@@ -79,9 +79,11 @@
             }
         },
         mounted() {
-            this.$ready(() => {
-                this.canvasHeight = this.$el.offsetHeight;
-                this.$nextTick(() => { this.init(); });
+            setTimeout(() => {
+                this.$nextTick(() => {
+                    this.canvasHeight = this.$el.offsetHeight;
+                    this.$nextTick(() => { this.init(); });
+                });
             });
         },
         watch: {
@@ -272,12 +274,6 @@
             }
         },
         methods: {
-            $ready(fn) {
-                if (process.env.NODE_ENV === "production") {
-                    return this.$nextTick(fn);
-                }
-                setTimeout(() => { this.$nextTick(fn); });
-            },
             init() {
                 this.loading = true;
                 this.player = new Player(this.src);
