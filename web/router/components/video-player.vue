@@ -84,7 +84,7 @@
                     this.canvasHeight = this.$el.offsetHeight;
                     this.$nextTick(() => { this.init(); });
                 });
-            });
+            }, 100);
         },
         watch: {
             "$route": "init",
