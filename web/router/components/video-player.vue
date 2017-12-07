@@ -12,7 +12,7 @@
 </i18n>
 <template>
     <div class="player">
-        <div id="video-canvas" class="uk-width-1-1 uk-height-1-1"></div>
+        <div id="video-canvas" :style="style"></div>
         <div class="uk-position-small uk-position-top-right">
             <span class="uk-label" v-if="totalFeatures">
                 {{ $t("total", { total: totalFeatures }) }}
@@ -53,6 +53,7 @@
         data() {
             return {
                 loading: false,
+                canvasHeight: 0,
                 player: null,
                 map: null,
                 center: [0, 0],
@@ -64,6 +65,9 @@
             }
         },
         computed: {
+            style() {
+                return { height: this.canvasHeight + "px" };
+            },
             totalFeatures() {
                 return this.vectorSource ? this.vectorSource.getFeatures().length : 0;
             },
@@ -75,7 +79,10 @@
             }
         },
         mounted() {
-            this.init();
+            this.$ready(() => {
+                this.canvasHeight = this.$el.offsetHeight;
+                this.$nextTick(() => { this.init(); });
+            });
         },
         watch: {
             "$route": "init",
@@ -265,6 +272,12 @@
             }
         },
         methods: {
+            $ready(fn) {
+                if (process.env.NODE_ENV === "production") {
+                    return this.$nextTick(fn);
+                }
+                setTimeout(() => { this.$nextTick(fn); });
+            },
             init() {
                 this.loading = true;
                 this.player = new Player(this.src);
