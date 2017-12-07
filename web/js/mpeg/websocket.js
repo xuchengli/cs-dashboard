@@ -5,6 +5,9 @@ class websocket {
         this.url = url;
         this.socket = null;
         this.destination = null;
+        this.demuxer = null;
+        this.decoder = null;
+        this.renderer = null;
 
         this.reconnectInterval = 5;
         this.shouldAttemptReconnect = true;
@@ -14,6 +17,8 @@ class websocket {
 
         this.reconnectTimeoutId = 0;
         this.progressTimeoutId = 0;
+
+        this.errorEvent = new Event("error");
     }
     connect(destination) {
         this.destination = destination;
@@ -25,6 +30,10 @@ class websocket {
         this.socket.close();
     }
     start() {
+        this.demuxer = this.destination.pesPacketInfo[JSMpeg.Demuxer.TS.STREAM.VIDEO_1];
+        this.decoder = this.demuxer.destination;
+        this.renderer = this.decoder.destination;
+
         this.shouldAttemptReconnect = true;
         this.established = false;
 
@@ -46,8 +55,6 @@ class websocket {
                 this.reconnectTimeoutId = setTimeout(() => {
                     this.start();
                 }, this.reconnectInterval * 1000);
-            } else {
-                console.error("视频连接失败!!!!");
             }
         }
     }
@@ -57,11 +64,9 @@ class websocket {
             /**
              * 成功解码第一帧后，代表成功读取了有效视频流
              */
-            if (this.progress !== 100 &&
-                this.destination.pesPacketInfo[JSMpeg.Demuxer.TS.STREAM.VIDEO_1]
-                    .destination.currentFrame > 0) {
-                this.progress = 100;
+            if (this.progress !== 100 && this.decoder.currentFrame > 0) {
                 this.established = true;
+                this.progress = 100;
             }
         }
     }
@@ -72,6 +77,10 @@ class websocket {
             this.progressTimeoutId = setTimeout(() => {
                 this.trickProgress();
             }, this.progress * Math.round(200 * Math.random()));
+        } else if (!this.established) {
+            console.error("视频连接失败!!!!");
+            this.destroy();
+            this.renderer.canvas.dispatchEvent(this.errorEvent);
         }
     }
 }

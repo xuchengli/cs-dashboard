@@ -2,11 +2,13 @@
     {
         "en": {
             "total": "Total: {total}",
-            "selected": "Selected: {selected}"
+            "selected": "Selected: {selected}",
+            "video-stream-error": "Open video stream error!"
         },
         "zh-CN": {
             "total": "总数: {total}",
-            "selected": "选中: {selected}"
+            "selected": "选中: {selected}",
+            "video-stream-error": "打开视频流失败！"
         }
     }
 </i18n>
@@ -27,6 +29,7 @@
     </div>
 </template>
 <script>
+    import UIkit from "uikit";
     import Player from "../../js/mpeg/player";
     import Map from "ol/map";
     import View from "ol/view";
@@ -283,6 +286,10 @@
                 this.player.renderer.canvas.addEventListener("play", () => {
                     if (this.loading) this.loading = false;
                     this.map.render();
+                });
+                this.player.renderer.canvas.addEventListener("error", () => {
+                    this.loading = false;
+                    UIkit.notification(this.$t("video-stream-error"), "danger");
                 });
                 this.vectorSource = new VectorSource({
                     wrapX: false
