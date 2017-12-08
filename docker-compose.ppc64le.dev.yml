@@ -18,6 +18,5 @@ services:
       - /data/upload:/usr/app/src/upload
   mongodb:
     image: ppc64le/mongodb:2.6.10
-    container_name: mongo
     volumes:
       - /data/db:/data/db
