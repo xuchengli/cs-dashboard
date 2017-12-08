@@ -74,13 +74,15 @@ class websocket {
         if (this.progressTimeoutId) clearTimeout(this.progressTimeoutId);
         if (this.progress < 100) {
             this.progress = this.progress < 90 ? this.progress + 5 : this.progress + 1;
-            this.progressTimeoutId = setTimeout(() => {
-                this.trickProgress();
-            }, this.progress * Math.round(200 * Math.random()));
-        } else if (!this.established) {
-            console.error("视频连接失败!!!!");
-            this.destroy();
-            this.renderer.canvas.dispatchEvent(this.errorEvent);
+            if (this.progress === 100 && !this.established) {
+                console.error("视频连接失败!!!!");
+                this.destroy();
+                this.renderer.canvas.dispatchEvent(this.errorEvent);
+            } else {
+                this.progressTimeoutId = setTimeout(() => {
+                    this.trickProgress();
+                }, this.progress * Math.round(200 * Math.random()));
+            }
         }
     }
 }
