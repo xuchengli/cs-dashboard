@@ -16,7 +16,9 @@ services:
       - "8084:8080"
     volumes:
       - /data/upload:/usr/app/src/upload
+    restart: always
   mongodb:
     image: ppc64le/mongodb:2.6.10
     volumes:
       - /data/db:/data/db
+    restart: always

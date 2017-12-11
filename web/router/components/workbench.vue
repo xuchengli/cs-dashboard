@@ -48,11 +48,12 @@
                     </div>
                 </div>
                 <div class="uk-card uk-card-default uk-margin-left uk-width-expand">
-                    <div class="uk-card-body uk-padding-remove video-player-wrapper">
+                    <div class="uk-card-body uk-padding-remove video-player">
                         <router-view name="video-player" :src="video.stream_address" :handle="handle">
                         </router-view>
                     </div>
-                    <div class="uk-card-footer uk-padding-remove">
+                    <div class="uk-card-footer uk-padding-remove video-timeline">
+                        <router-view name="timeline"></router-view>
                     </div>
                 </div>
                 <div class="uk-card uk-card-default uk-margin-left uk-width-1-5">
@@ -111,7 +112,10 @@
     .uk-card-content-padding .uk-h4 {
         color: #666;
     }
-    .video-player-wrapper {
+    .video-player {
         height: 90%;
+    }
+    .video-timeline {
+        height: 10%;
     }
 </style>

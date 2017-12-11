@@ -8,6 +8,7 @@ import Workbench from "./components/workbench.vue";
 import Toolkit from "./components/toolkit.vue";
 import APIList from "./components/api-list.vue";
 import VideoPlayer from "./components/video-player.vue";
+import TimeLine from "./components/timeline.vue";
 
 Vue.use(VueRouter);
 
@@ -31,7 +32,8 @@ const router = new VueRouter({
                         "default": Header,
                         "toolkit": Toolkit,
                         "api-list": APIList,
-                        "video-player": VideoPlayer
+                        "video-player": VideoPlayer,
+                        "timeline": TimeLine
                     }
                 }
             ],
