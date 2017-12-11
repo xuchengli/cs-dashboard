@@ -75,12 +75,12 @@
                 if (selected) {
                     selected.active = false;
                     if (selected.name === toolName) {
-                        this.$emit("select", "");
+                        this.$store.commit("selectTool", { name: "" });
                         return;
                     }
                 }
                 this.tools.find(tool => tool.name === toolName).active = true;
-                this.$emit("select", toolName);
+                this.$store.commit("selectTool", { name: toolName });
             }
         },
         components: {

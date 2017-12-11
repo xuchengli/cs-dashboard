@@ -52,7 +52,7 @@
     import Transform from "../../js/ol/transform";
 
     export default {
-        props: ["src", "handle"],
+        props: ["src"],
         data() {
             return {
                 loading: false,
@@ -91,7 +91,7 @@
         },
         watch: {
             "$route": "init",
-            handle: function(h) {
+            "$store.state.toolkit-handle": function(h) {
                 while (this.interactions.length) {
                     this.map.removeInteraction(this.interactions.pop());
                 }

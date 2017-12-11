@@ -35,7 +35,7 @@
                             <h4 class="uk-h4">{{ $t("toolkit") }}</h4>
                         </div>
                         <div class="uk-card-body uk-card-content-padding">
-                            <router-view name="toolkit" @select="select"></router-view>
+                            <router-view name="toolkit"></router-view>
                         </div>
                     </div>
                     <div class="uk-card uk-card-default uk-margin-top">
@@ -49,8 +49,7 @@
                 </div>
                 <div class="uk-card uk-card-default uk-margin-left uk-width-expand">
                     <div class="uk-card-body uk-padding-remove video-player">
-                        <router-view name="video-player" :src="video.stream_address" :handle="handle">
-                        </router-view>
+                        <router-view name="video-player" :src="video.stream_address"></router-view>
                     </div>
                     <div class="uk-card-footer uk-padding-remove video-timeline">
                         <router-view name="timeline"></router-view>
@@ -74,8 +73,7 @@
         data() {
             return {
                 loading: false,
-                video: {},
-                handle: ""
+                video: {}
             }
         },
         created() {
@@ -98,9 +96,6 @@
                         UIkit.notification(this.$t("global.error.500"), "danger");
                     }
                 });
-            },
-            select(tool) {
-                this.handle = tool;
             }
         }
     }

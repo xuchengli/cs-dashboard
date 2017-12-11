@@ -3,6 +3,7 @@ import "ol/ol.css";
 import Vue from "vue";
 import VueI18n from "vue-i18n";
 import VueCookie from "vue-cookie";
+import Vuex from "vuex";
 import UIkit from "uikit";
 import Icons from "uikit/dist/js/uikit-icons";
 import router from "../router";
@@ -11,6 +12,7 @@ import LocaleSelect from "../components/locale-select.vue";
 UIkit.use(Icons);
 Vue.use(VueI18n);
 Vue.use(VueCookie);
+Vue.use(Vuex);
 Vue.component("locale-select", LocaleSelect);
 
 let lang = Vue.cookie.get("locale") || navigator.language || navigator.userLanguage;
@@ -36,8 +38,19 @@ const i18n = new VueI18n({
         }
     }
 });
+const store = new Vuex.Store({
+    state: {
+        "toolkit-handle": ""
+    },
+    mutations: {
+        selectTool(state, tool) {
+            state["toolkit-handle"] = tool.name;
+        }
+    }
+});
 new Vue({
     i18n,
+    store,
     router,
     data: {
         locale: lang
