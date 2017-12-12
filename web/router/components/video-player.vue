@@ -79,6 +79,9 @@
             },
             selectedFeatures() {
                 return this.selectInteraction ? this.selectedFeaturesCollection.getLength() : 0;
+            },
+            handle() {
+                return this.$store.state["toolkit-handle"];
             }
         },
         mounted() {
@@ -91,7 +94,7 @@
         },
         watch: {
             "$route": "init",
-            "$store.state.toolkit-handle": function(h) {
+            "handle": function(h) {
                 while (this.interactions.length) {
                     this.map.removeInteraction(this.interactions.pop());
                 }
