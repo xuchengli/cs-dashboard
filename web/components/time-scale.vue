@@ -152,7 +152,7 @@
     .scale span {
         position: absolute;
         left: 2px;
-        bottom: -10px;
+        bottom: -9px;
         font-size: 10px;
         color: #bbb;
     }
