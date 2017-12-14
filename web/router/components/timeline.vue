@@ -15,7 +15,7 @@
 <template>
     <div class="dashboard">
         <div class="timeline">
-            <time-scale :scale-ratio="ratio" :scale-unit="unit"></time-scale>
+            <time-scale :scale-ratio="ratio" :scale-unit="unit" :time="time"></time-scale>
             <div class="reference-axis"></div>
         </div>
         <div class="time-scale-adjuster">
@@ -50,6 +50,9 @@
             },
             unit() {
                 return this.value.substring(this.value.length - 1);
+            },
+            time() {
+                return this.$store.state["video-current-time"];
             },
             formatter() {
                 return this.ratio + " " + this.$t(this.unit);

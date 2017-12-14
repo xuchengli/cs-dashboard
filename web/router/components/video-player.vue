@@ -281,14 +281,21 @@
         },
         methods: {
             init() {
+                let now = Date.now();
                 this.loading = true;
                 this.player = new Player(this.src);
                 this.player.renderer.canvas.addEventListener("progress", () => {
                     this.map.render();
                 });
                 this.player.renderer.canvas.addEventListener("play", () => {
-                    if (this.loading) this.loading = false;
+                    if (this.loading) {
+                        now = Date.now();
+                        this.loading = false;
+                    }
                     this.map.render();
+                    this.$store.commit("setVideoTime", {
+                        currentTime: now + this.player.currentTime * 1000
+                    });
                 });
                 this.player.renderer.canvas.addEventListener("error", () => {
                     this.loading = false;

@@ -40,11 +40,15 @@ const i18n = new VueI18n({
 });
 const store = new Vuex.Store({
     state: {
-        "toolkit-handle": ""
+        "toolkit-handle": "",
+        "video-current-time": Date.now()
     },
     mutations: {
         selectTool(state, tool) {
             state["toolkit-handle"] = tool.name;
+        },
+        setVideoTime(state, video) {
+            state["video-current-time"] = video.currentTime;
         }
     }
 });
