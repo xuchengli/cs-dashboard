@@ -1,7 +1,9 @@
 <template>
-    <div class="uk-flex uk-flex-middle uk-height-1-1">
+    <div class="uk-position-absolute uk-width-1-1 uk-height-1-1">
         <div class="scale" v-for="scale of scales"
-            :style="{ height: scale.label ? '60%' : '30%', left: scale.distance + 'px' }">
+            :style="{ height: scale.label ? '60%' : '30%',
+                      top: scale.label ? '20%' : '35%',
+                      left: scale.distance + 'px' }">
             <span class="uk-text-nowrap" v-if="scale.label">{{ scale.label }}</span>
         </div>
     </div>
