@@ -15,7 +15,10 @@
 <template>
     <div class="dashboard">
         <div class="timeline">
-            <time-scale :scale-ratio="ratio" :scale-unit="unit" :time="time"></time-scale>
+            <time-scale :scale-ratio="ratio" :scale-unit="unit" :scale-pixel="scaleWidth"
+                        :time="time"></time-scale>
+            <time-elapse :scale-ratio="ratio" :scale-unit="unit" :scale-pixel="scaleWidth"
+                        :time="elapse"></time-elapse>
             <div class="reference-axis"></div>
         </div>
         <div class="time-scale-adjuster">
@@ -27,11 +30,13 @@
 </template>
 <script>
     import TimeScale from "../../components/time-scale.vue";
+    import TimeElapse from "../../components/time-elapse.vue";
     import vueSlider from "vue-slider-component";
 
     export default {
         data() {
             return {
+                scaleWidth: 20,
                 pieces: ["1s", "30s", "1m", "30m", "1h", "12h", "24h"],
                 value: "1m",
                 pieceStyle: {
@@ -54,12 +59,16 @@
             time() {
                 return this.$store.state["video-current-time"];
             },
+            elapse() {
+                return this.$store.state["video-elapse-time"];
+            },
             formatter() {
                 return this.ratio + " " + this.$t(this.unit);
             }
         },
         components: {
             TimeScale,
+            TimeElapse,
             vueSlider
         }
     }

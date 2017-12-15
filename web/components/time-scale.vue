@@ -11,7 +11,6 @@
 <script>
     import dateFormat from "dateformat";
 
-    const PIXEL_PER_SCALE = 20;
     export default {
         props: {
             time: {
@@ -25,6 +24,10 @@
             scaleUnit: {
                 type: String,
                 default: "m"
+            },
+            scalePixel: {
+                type: Number,
+                default: 20
             }
         },
         data() {
@@ -43,7 +46,7 @@
                     t += min * 60000;
                     scales.push({
                         "time": t,
-                        "distance": this.width / 2 + min / (this.scaleRatio * 60) * PIXEL_PER_SCALE,
+                        "distance": this.width / 2 + min / (this.scaleRatio * 60) * this.scalePixel,
                         "label": this.mdh(t)
                     });
                 } else if (this.scaleUnit === "m") {
@@ -52,7 +55,7 @@
                     t += sec * 1000;
                     scales.push({
                         "time": t,
-                        "distance": this.width / 2 + sec / (this.scaleRatio * 60) * PIXEL_PER_SCALE,
+                        "distance": this.width / 2 + sec / (this.scaleRatio * 60) * this.scalePixel,
                         "label": this.HHMM(t)
                     });
                 } else if (this.scaleUnit === "s") {
@@ -61,7 +64,7 @@
                     t += ms;
                     scales.push({
                         "time": t,
-                        "distance": this.width / 2 + ms / (this.scaleRatio * 1000) * PIXEL_PER_SCALE,
+                        "distance": this.width / 2 + ms / (this.scaleRatio * 1000) * this.scalePixel,
                         "label": this.HHMMss(t)
                     });
                 }
@@ -112,7 +115,7 @@
                     }
                     scales.push({
                         "time": rt,
-                        "distance": scales[scales.length - 1].distance + PIXEL_PER_SCALE,
+                        "distance": scales[scales.length - 1].distance + this.scalePixel,
                         "label": label
                     });
                 }
@@ -135,7 +138,7 @@
                     }
                     scales.unshift({
                         "time": lt,
-                        "distance": scales[0].distance - PIXEL_PER_SCALE,
+                        "distance": scales[0].distance - this.scalePixel,
                         "label": label
                     });
                 }

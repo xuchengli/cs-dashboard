@@ -280,9 +280,16 @@
             }
         },
         methods: {
+            setVideoTime(start, elapse) {
+                this.$store.commit("setVideoTime", {
+                    currentTime: start + elapse * 1000,
+                    elapseTime: elapse
+                });
+            },
             init() {
                 let now = Date.now();
                 this.loading = true;
+                this.setVideoTime(now, 0);
                 this.player = new Player(this.src);
                 this.player.renderer.canvas.addEventListener("progress", () => {
                     this.map.render();
@@ -293,9 +300,7 @@
                         this.loading = false;
                     }
                     this.map.render();
-                    this.$store.commit("setVideoTime", {
-                        currentTime: now + this.player.currentTime * 1000
-                    });
+                    this.setVideoTime(now, this.player.currentTime);
                 });
                 this.player.renderer.canvas.addEventListener("error", () => {
                     this.loading = false;

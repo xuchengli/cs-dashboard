@@ -41,7 +41,8 @@ const i18n = new VueI18n({
 const store = new Vuex.Store({
     state: {
         "toolkit-handle": "",
-        "video-current-time": Date.now()
+        "video-current-time": Date.now(),
+        "video-elapse-time": 0
     },
     mutations: {
         selectTool(state, tool) {
@@ -49,6 +50,7 @@ const store = new Vuex.Store({
         },
         setVideoTime(state, video) {
             state["video-current-time"] = video.currentTime;
+            state["video-elapse-time"] = video.elapseTime;
         }
     }
 });
