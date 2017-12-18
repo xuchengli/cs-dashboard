@@ -160,5 +160,9 @@
         bottom: -9px;
         font-size: 10px;
         color: #bbb;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
 </style>
