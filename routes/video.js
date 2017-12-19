@@ -38,13 +38,9 @@ router.post("/upload", upload, (req, res) => {
         //创建视频流
         let videoSrc = req.protocol + "://" + req.get("host") +
                     config.Context_Path + "/api/video/" + saved._id;
-        let videoStream = yield video.createStream(videoSrc, "");
-        if (videoStream.success) {
-            let integratedVideo = yield video.setStream(saved._id, videoStream);
-            res.json(integratedVideo);
-        } else {
-            res.sendStatus(503);
-        }
+        let videoStream = yield video.createStream(videoSrc);
+        let integratedVideo = yield video.setStream(saved._id, videoStream);
+        res.json(integratedVideo);
     }).catch(err => {
         console.error(err);
         res.sendStatus(500);
@@ -74,13 +70,9 @@ router.post("/stream", (req, res) => {
         let userInfo = JSON.parse(req.cookies[config.cookieName]);
         let saved = yield video.save(userInfo.apikey, file);
         //创建视频流
-        let videoStream = yield video.createStream(fileurl, "");
-        if (videoStream.success) {
-            let integratedVideo = yield video.setStream(saved._id, videoStream);
-            res.json(integratedVideo);
-        } else {
-            res.sendStatus(503);
-        }
+        let videoStream = yield video.createStream(fileurl);
+        let integratedVideo = yield video.setStream(saved._id, videoStream);
+        res.json(integratedVideo);
     }).catch(err => {
         console.error(err);
         res.sendStatus(500);
@@ -113,12 +105,8 @@ router.delete("/:id", (req, res) => {
         let file = yield video.remove(req.params.id);
         fs.removeSync(file.destination);
         //删除视频流
-        let streamDeleted = yield video.deleteStream(file.stream_id);
-        if (streamDeleted.success) {
-            res.json(file);
-        } else {
-            res.sendStatus(503);
-        }
+        yield video.deleteStream(file.stream_id);
+        res.json(file);
     }).catch(err => {
         console.error(err);
         res.sendStatus(500);

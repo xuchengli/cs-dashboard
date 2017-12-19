@@ -15,5 +15,5 @@ module.exports = {
             password: "vbadminpassw0rd"
         }
     },
-    Video_Stream_API: process.env.Video_Stream_API || "http://9.186.106.206:8083/demo_video/stream"
+    Video_Stream_API: process.env.Video_Stream_API || "http://9.186.106.206:8085/video-insight/api"
 };

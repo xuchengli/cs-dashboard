@@ -12,8 +12,7 @@
             "confirm-msg": "Are you sure to delete the video?",
             "prompt-msg": "Video stream URL: <p class='uk-text-meta uk-margin-small-bottom'>e.g., {example}</p>",
             "cancel": "Cancel",
-            "ok": "Ok",
-            "error503": "The video stream service unavailable."
+            "ok": "Ok"
         },
         "zh-CN": {
             "edit": "编辑",
@@ -27,8 +26,7 @@
             "confirm-msg": "你确信要删除这个视频吗？",
             "prompt-msg": "视频流地址：<p class='uk-text-meta uk-margin-small-bottom'>例如，{example}</p>",
             "cancel": "取消",
-            "ok": "确定",
-            "error503": "视频流服务不可用！"
+            "ok": "确定"
         }
     }
 </i18n>
@@ -165,8 +163,6 @@
                                         cover: "video/" + response._id + "/cover",
                                         overlay: false
                                     });
-                                } else if (e.status === 503) {
-                                    UIkit.notification(this.$t("error503"), "danger");
                                 } else {
                                     UIkit.notification(this.$t("upload-fail-msg"), "danger");
                                 }
@@ -196,11 +192,7 @@
                     axios.delete("video/" + id).then(res => {
                         this.videos.splice(this.videos.findIndex(video => video.id === id), 1);
                     }).catch(err => {
-                        if (err.response.status === 503) {
-                            UIkit.notification(this.$t("error503"), "danger");
-                        } else {
-                            UIkit.notification(this.$t("global.error.500"), "danger");
-                        }
+                        UIkit.notification(this.$t("global.error.500"), "danger");
                     });
                 }, () => {});
             },
@@ -236,11 +228,7 @@
                         }).catch(err => {
                             this.uploading = false;
                             this.uploadedPercentage = 100;
-                            if (err.response.status === 503) {
-                                UIkit.notification(this.$t("error503"), "danger");
-                            } else {
-                                UIkit.notification(this.$t("global.error.500"), "danger");
-                            }
+                            UIkit.notification(this.$t("global.error.500"), "danger");
                         });
                     }
                 });

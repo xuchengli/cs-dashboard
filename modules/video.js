@@ -76,11 +76,12 @@ class video {
             );
         });
     }
-    createStream(src, api) {
+    createStream(src) {
         return new Promise((resolve, reject) => {
-            axios.post(config.Video_Stream_API, {
-                video_src: src,
-                api: api
+            axios.post("/streams/", {
+                source: src
+            }, {
+                baseURL: config.Video_Stream_API
             }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
@@ -89,9 +90,9 @@ class video {
             Video.findByIdAndUpdate(videoId,
                 {
                     $set: {
-                        stream_id: stream.stream_id,
-                        stream_address: stream.stream_address,
-                        stream_api: stream.stream_api
+                        stream_id: stream.id,
+                        stream_address: stream.url.ws,
+                        stream_api: stream.url.api
                     }
                 },
                 { new: true, select: { __v: 0 } },
@@ -100,6 +101,13 @@ class video {
                     resolve(video);
                 }
             );
+        });
+    }
+    deleteStream(id) {
+        return new Promise((resolve, reject) => {
+            axios.delete("/streams/" + id, {
+                baseURL: config.Video_Stream_API
+            }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
     bindAPI(url, api) {
@@ -116,13 +124,6 @@ class video {
                 action: "remove",
                 api: api
             }, { baseURL: url }).then(res => resolve(res.data)).catch(err => reject(err));
-        });
-    }
-    deleteStream(id) {
-        return new Promise((resolve, reject) => {
-            axios.delete(config.Video_Stream_API, {
-                data: { id: id }
-            }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
 }
