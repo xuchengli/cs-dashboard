@@ -112,10 +112,9 @@ class video {
     }
     bindAPI(url, api) {
         return new Promise((resolve, reject) => {
-            axios.post("/api/operate", {
-                action: "add",
+            axios.post("/apis/", {
                 api: api
-            }, { baseURL: url }).then(res => resolve(res.data)).catch(err => reject(err));
+            }, { baseURL: url + "/api" }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
     unbindAPI(url, api) {

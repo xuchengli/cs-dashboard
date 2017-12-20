@@ -126,10 +126,10 @@ router.get("/:id", (req, res) => {
         res.sendStatus(500);
     });
 });
-router.post("/bind/:api", (req, res) => {
+router.post("/bind", (req, res) => {
     co(function* () {
         let video = new Video();
-        let binded = yield video.bindAPI(req.body.url, req.params.api);
+        let binded = yield video.bindAPI(req.body.url, req.body.api);
         res.json(binded);
     }).catch(err => {
         console.error(err);
