@@ -117,12 +117,11 @@ class video {
             }, { baseURL: url + "/api" }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
-    unbindAPI(url, api) {
+    unbindAPI(url, id) {
         return new Promise((resolve, reject) => {
-            axios.post("/api/operate", {
-                action: "remove",
-                api: api
-            }, { baseURL: url }).then(res => resolve(res.data)).catch(err => reject(err));
+            axios.delete("/apis/" + id, {
+                baseURL: url + "/api"
+            }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
 }

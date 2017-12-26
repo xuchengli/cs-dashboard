@@ -136,10 +136,10 @@ router.post("/bind", (req, res) => {
         res.sendStatus(500);
     });
 });
-router.post("/unbind/:api", (req, res) => {
+router.delete("/unbind/:id", (req, res) => {
     co(function* () {
         let video = new Video();
-        let unbinded = yield video.unbindAPI(req.body.url, req.params.api);
+        let unbinded = yield video.unbindAPI(req.body.url, req.params.id);
         res.json(unbinded);
     }).catch(err => {
         console.error(err);

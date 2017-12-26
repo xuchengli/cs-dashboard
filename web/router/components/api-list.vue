@@ -4,13 +4,15 @@
             "cod": "Detection",
             "cic": "Classification",
             "no-data": "The API is not exist.",
-            "bind": "Bind"
+            "bind": "Bind",
+            "unbind": "Unbind"
         },
         "zh-CN": {
             "cod": "检测",
             "cic": "分类",
             "no-data": "接口不存在！",
-            "bind": "绑定"
+            "bind": "绑定",
+            "unbind": "解绑"
         }
     }
 </i18n>
@@ -25,7 +27,7 @@
                 {{ $t("no-data") }}
             </div>
         </div>
-        <div class="uk-text-small" v-else>
+        <div class="uk-flex uk-flex-column uk-text-small" v-else>
             <ul class="uk-list uk-margin-remove">
                 <li v-for="[usage, apis] of entries">
                     <span class="uk-label">
@@ -47,28 +49,26 @@
                     </ul>
                 </li>
             </ul>
-            <hr class="uk-margin-small">
-            <button class="uk-button uk-button-default uk-button-small uk-align-right uk-margin-remove"
-                :disabled="Object.keys(bundles).length === 0 || status !== ''"
+            <button class="uk-button uk-button-default uk-button-small uk-margin-small-top"
+                :disabled="Object.keys(bundle).length === 0 || status !== ''"
                 @click="bind()">
                 {{ $t("bind") }}
                 <div uk-spinner="ratio: .5" v-if="status === 'binding'"></div>
-                <span uk-icon="icon: plus; ratio: .7" v-else></span>
+                <span uk-icon="icon: plus-circle; ratio: .7" v-else></span>
             </button>
+            <ul class="uk-list uk-margin-remove-bottom uk-margin-small-top">
+                <li v-for="reducedBundle of reducedBundles">
+                    <div class="uk-flex uk-flex-between uk-flex-middle">
+                        <label class="uk-text-truncate" uk-tooltip :title="reducedBundle.category">
+                            {{ reducedBundle.category }}
+                        </label>
+                        <div uk-spinner="ratio: .5" v-if="reducedBundle.status === 'unbinding'"></div>
+                        <a uk-icon="icon: minus-circle; ratio: .7" uk-tooltip :title="$t('unbind')"
+                            @click="unbind(reducedBundle.id)" v-else></a>
+                    </div>
+                </li>
+            </ul>
         </div>
-        <!-- <ul class="uk-list uk-margin-remove" v-else>
-            <li v-for="api of apis">
-                <div class="uk-flex uk-flex-between uk-flex-middle">
-                    <span class="uk-text-truncate" uk-tooltip :title="api.categories">
-                        {{ api.categories }}
-                    </span>
-                    <div uk-spinner="ratio: .7" v-if="api.status === 'operating'"></div>
-                    <a uk-icon="icon: minus-circle" @click="unbind(api.id)"
-                        v-else-if="api.status === 'bind'"></a>
-                    <a uk-icon="icon: plus-circle" @click="bind(api.id)" v-else></a>
-                </div>
-            </li>
-        </ul> -->
     </div>
 </template>
 <script>
@@ -80,23 +80,92 @@
         data() {
             return {
                 loading: false,
+                /**
+                 * apis格式：
+                 * {
+                 *   cod: [
+                 *     {
+                 *       id: "xxxx",
+                 *       categories: "xxxx",
+                 *       status: "xxxx",
+                 *       selected: true/false
+                 *     },
+                 *     {...}
+                 *   ],
+                 *   cic: [
+                 *     {
+                 *       id: "xxxx",
+                 *       categories: "xxxx",
+                 *       status: "xxxx",
+                 *       selected: true/false
+                 *     },
+                 *     {...}
+                 *   ]
+                 * }
+                 */
                 apis: {},
-                status: ""
+                status: "",
+                /**
+                 * bundles格式：
+                 * [
+                 *   {
+                 *     id: "xxxx",
+                 *     api: {
+                 *       cod: {
+                 *         id: "xxxx",
+                 *         categories: "xxxx",
+                 *         status: "xxxx",
+                 *         selected: true/false
+                 *       },
+                 *       cic: [
+                 *         {
+                 *           id: "xxxx",
+                 *           categories: "xxxx",
+                 *           status: "xxxx",
+                 *           selected: true/false
+                 *         },
+                 *         {...}
+                 *       ]
+                 *     },
+                 *     status: "xxxx"
+                 *   }
+                 * ]
+                 */
+                bundles: []
             }
         },
         computed: {
             entries() {
                 return Object.entries(this.apis).sort().reverse();
             },
-            bundles() {
-                let bundles = {};
+            bundle() {
+                let bundle = {};
                 if (this.apis.cod) {
                     let sel = this.apis.cod.find(api => api.status !== "bind" && api.selected);
-                    if (sel) bundles["cod"] = sel.id;
+                    if (sel) bundle["cod"] = sel.id;
                 }
                 if (this.apis.cic) {
                     let sels = this.apis.cic.filter(api => api.status !== "bind" && api.selected);
-                    if (sels.length) bundles["cic"] = sels.map(sel => sel.id);
+                    if (sels.length) bundle["cic"] = sels.map(sel => sel.id);
+                }
+                return bundle;
+            },
+            reducedBundles() {
+                let bundles = [];
+                for (let _bundle of this.bundles) {
+                    let bundle = {
+                        id: _bundle.id,
+                        status: _bundle.status
+                    };
+                    let category = "";
+                    if (_bundle.api.cod) {
+                        category += _bundle.api.cod.categories;
+                    }
+                    if (_bundle.api.cic) {
+                        category += "[" + _bundle.api.cic.map(cic => cic.categories).join(",") + "]";
+                    }
+                    bundle["category"] = category;
+                    bundles.push(bundle);
                 }
                 return bundles;
             }
@@ -152,17 +221,25 @@
                 this.status = "binding";
                 axios.post("video/bind", {
                     url: this.stream_api,
-                    api: this.bundles
+                    api: this.bundle
                 }).then(res => {
+                    let bundle = {
+                        id: res.data.id,
+                        api: {},
+                        status: "ready"
+                    };
                     let api = res.data.api;
                     if (api.cod) {
-                        this.apis.cod.find(_api => _api.id === api.cod).status = "bind";
+                        let _cod = this.apis.cod.find(_api => _api.id === api.cod);
+                        _cod.status = "bind";
+                        bundle.api["cod"] = _cod;
                     }
                     if (api.cic) {
-                        this.apis.cic.filter(_api => api.cic.includes(_api.id)).forEach(_api => {
-                            _api.status = "bind";
-                        });
+                        let _cic = this.apis.cic.filter(_api => api.cic.includes(_api.id));
+                        _cic.forEach(_api => { _api.status = "bind"; });
+                        bundle.api["cic"] = _cic;
                     }
+                    this.bundles.push(bundle);
                     this.status = "";
                 }).catch(err => {
                     this.status = "";
@@ -170,17 +247,33 @@
                 });
             },
             unbind(id) {
-                // let api = this.apis.find(api => api.id === id);
-                // api.status = "operating";
-                // axios.post("video/unbind/" + id, {
-                //     url: this.stream_api
-                // }).then(res => {
-                //     console.log("unbind API", res.data);
-                //     api.status = "unbind";
-                // }).catch(err => {
-                //     api.status = "bind";
-                //     UIkit.notification(this.$t("global.error.500"), "danger");
-                // });
+                this.status = "unbinding";
+                this.bundles.find(bundle => bundle.id === id).status = "unbinding";
+                axios.delete("video/unbind/" + id, {
+                    data: { url: this.stream_api }
+                }).then(res => {
+                    let bundle = this.bundles.splice(
+                        this.bundles.findIndex(bundle => bundle.id === id), 1);
+                    if (bundle.length) {
+                        if (bundle[0].api.cod) {
+                            let _cod = this.apis.cod.find(_api => _api.id === bundle[0].api.cod.id);
+                            _cod.status = "ready";
+                            _cod.selected = false;
+                        }
+                        if (bundle[0].api.cic) {
+                            let _cic = this.apis.cic.filter(
+                                _api => bundle[0].api.cic.map(cic => cic.id).includes(_api.id));
+                            _cic.forEach(_api => {
+                                _api.status = "ready";
+                                _api.selected = false;
+                            });
+                        }
+                    }
+                    this.status = "";
+                }).catch(err => {
+                    this.status = "";
+                    UIkit.notification(this.$t("global.error.500"), "danger");
+                });
             }
         }
     }
