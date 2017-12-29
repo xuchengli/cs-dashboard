@@ -124,5 +124,12 @@ class video {
             }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
+    listAPIs(url) {
+        return new Promise((resolve, reject) => {
+            axios("/apis/", {
+                baseURL: url + "/api"
+            }).then(res => resolve(res.data)).catch(err => reject(err));
+        });
+    }
 }
 module.exports = video;
