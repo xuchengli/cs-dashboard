@@ -69,8 +69,14 @@
                 tools: tools
             };
         },
+        computed: {
+            videoPlay() {
+                return this.$store.state["video-play"];
+            }
+        },
         methods: {
             select(toolName) {
+                if (!this.videoPlay) return;
                 let selected = this.tools.find(tool => tool.active);
                 if (selected) {
                     selected.active = false;
