@@ -146,4 +146,14 @@ router.delete("/unbind/:id", (req, res) => {
         res.sendStatus(500);
     });
 });
+router.post("/apis", (req, res) => {
+    co(function* () {
+        let video = new Video();
+        let apis = yield video.listAPIs(req.body.url);
+        res.json(apis.apis);
+    }).catch(err => {
+        console.error(err);
+        res.sendStatus(500);
+    });
+});
 module.exports = router;

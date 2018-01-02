@@ -39,10 +39,10 @@
                                 <input type="radio" class="uk-radio"
                                     v-if="usage === 'cod'" :checked="api.selected"
                                     @click="selectCod(api.id)"
-                                    :disabled="api.status === 'bind' || status !== ''">
+                                    :disabled="api.status === 'bind' || status !== '' || !videoPlay">
                                 <input type="checkbox" class="uk-checkbox"
                                     v-else-if="usage === 'cic'" v-model="api.selected"
-                                    :disabled="api.status === 'bind' || status !== ''">
+                                    :disabled="api.status === 'bind' || status !== '' || !videoPlay">
                                 {{ api.categories }}
                             </label>
                         </li>
@@ -50,13 +50,17 @@
                 </li>
             </ul>
             <button class="uk-button uk-button-default uk-button-small uk-margin-small-top"
-                :disabled="Object.keys(bundle).length === 0 || status !== ''"
+                :disabled="Object.keys(bundle).length === 0 || status !== '' || !videoPlay"
                 @click="bind()">
                 {{ $t("bind") }}
                 <div uk-spinner="ratio: .5" v-if="status === 'binding'"></div>
                 <span uk-icon="icon: plus-circle; ratio: .7" v-else></span>
             </button>
-            <ul class="uk-list uk-margin-remove-bottom uk-margin-small-top">
+            <div class="uk-flex uk-margin-small-top" v-if="!videoPlay">
+                <div class="uk-margin-auto uk-margin-auto-vertical"
+                    uk-spinner="ratio: .6" key="video_api_spinner"></div>
+            </div>
+            <ul class="uk-list uk-margin-remove-bottom uk-margin-small-top" v-else>
                 <li v-for="reducedBundle of reducedBundles">
                     <div class="uk-flex uk-flex-between uk-flex-middle">
                         <label class="uk-text-truncate" uk-tooltip :title="reducedBundle.category">
@@ -168,13 +172,29 @@
                     bundles.push(bundle);
                 }
                 return bundles;
+            },
+            videoPlay() {
+                return this.$store.state["video-play"];
             }
         },
         created() {
             this.getAPIs();
         },
         watch: {
-            "$route": "getAPIs"
+            "$route": "getAPIs",
+            "videoPlay": function(play) {
+                if (play) {
+                    axios.post("video/apis", {
+                        url: this.stream_api
+                    }).then(res => {
+                        for (let bundle of res.data) {
+                            this.bundles.push(this.inflateBundle(bundle));
+                        }
+                    }).catch(err => {
+                        UIkit.notification(this.$t("global.error.500"), "danger");
+                    });
+                }
+            }
         },
         methods: {
             inflateBundle(bundle) {
@@ -202,10 +222,8 @@
             },
             getAPIs() {
                 this.loading = true;
-                axios.post("ai-vision/webapis", {
-                    url: this.stream_api
-                }).then(res => {
-                    for (let api of res.data.AIVision) {
+                axios("ai-vision/webapis").then(res => {
+                    for (let api of res.data) {
                         let categories = api.categories.map(
                             category => category.category_name).join(",");
                         if (api.usage === "cod") {
@@ -225,9 +243,6 @@
                                 selected: false
                             });
                         }
-                    }
-                    for (let bundle of res.data.video) {
-                        this.bundles.push(this.inflateBundle(bundle));
                     }
                     this.loading = false;
                 }).catch(err => {

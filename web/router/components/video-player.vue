@@ -289,6 +289,7 @@
             init() {
                 let now = Date.now();
                 this.loading = true;
+                this.$store.commit("playVideo", false);
                 this.setVideoTime(now, 0);
                 this.player = new Player(this.src);
                 this.player.renderer.canvas.addEventListener("progress", () => {
@@ -298,6 +299,7 @@
                     if (this.loading) {
                         now = Date.now();
                         this.loading = false;
+                        this.$store.commit("playVideo", true);
                     }
                     this.map.render();
                     this.setVideoTime(now, this.player.currentTime);
