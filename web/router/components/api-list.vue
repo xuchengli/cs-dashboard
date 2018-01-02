@@ -177,11 +177,35 @@
             "$route": "getAPIs"
         },
         methods: {
+            inflateBundle(bundle) {
+                let _bundle = {
+                    id: bundle.id,
+                    api: {},
+                    status: "ready"
+                };
+                let api = bundle.api;
+                if (api.cod) {
+                    let _cod = this.apis.cod.find(_api => _api.id === api.cod);
+                    _cod.status = "bind";
+                    _cod.selected = true;
+                    _bundle.api["cod"] = _cod;
+                }
+                if (api.cic) {
+                    let _cic = this.apis.cic.filter(_api => api.cic.includes(_api.id));
+                    _cic.forEach(_api => {
+                        _api.status = "bind";
+                        _api.selected = true;
+                    });
+                    _bundle.api["cic"] = _cic;
+                }
+                return _bundle;
+            },
             getAPIs() {
                 this.loading = true;
-                axios("ai-vision/webapis").then(res => {
-                    this.loading = false;
-                    for (let api of res.data) {
+                axios.post("ai-vision/webapis", {
+                    url: this.stream_api
+                }).then(res => {
+                    for (let api of res.data.AIVision) {
                         let categories = api.categories.map(
                             category => category.category_name).join(",");
                         if (api.usage === "cod") {
@@ -202,6 +226,10 @@
                             });
                         }
                     }
+                    for (let bundle of res.data.video) {
+                        this.bundles.push(this.inflateBundle(bundle));
+                    }
+                    this.loading = false;
                 }).catch(err => {
                     this.loading = false;
                     UIkit.notification(this.$t("global.error.500"), "danger");
@@ -223,23 +251,7 @@
                     url: this.stream_api,
                     api: this.bundle
                 }).then(res => {
-                    let bundle = {
-                        id: res.data.id,
-                        api: {},
-                        status: "ready"
-                    };
-                    let api = res.data.api;
-                    if (api.cod) {
-                        let _cod = this.apis.cod.find(_api => _api.id === api.cod);
-                        _cod.status = "bind";
-                        bundle.api["cod"] = _cod;
-                    }
-                    if (api.cic) {
-                        let _cic = this.apis.cic.filter(_api => api.cic.includes(_api.id));
-                        _cic.forEach(_api => { _api.status = "bind"; });
-                        bundle.api["cic"] = _cic;
-                    }
-                    this.bundles.push(bundle);
+                    this.bundles.push(this.inflateBundle(res.data));
                     this.status = "";
                 }).catch(err => {
                     this.status = "";
