@@ -131,5 +131,19 @@ class video {
             }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
+    startRecord(url) {
+        return new Promise((resolve, reject) => {
+            axios.post("/record-video/", {
+                record_video: { on: true }
+            }, { baseURL: url + "/api" }).then(res => resolve(res.data)).catch(err => reject(err));
+        });
+    }
+    stopRecord(url, seconds) {
+        return new Promise((resolve, reject) => {
+            axios.post("/record-video/", {
+                record_video: { on: false, seconds: seconds }
+            }, { baseURL: url + "/api" }).then(res => resolve(res.data)).catch(err => reject(err));
+        });
+    }
 }
 module.exports = video;

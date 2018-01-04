@@ -156,4 +156,19 @@ router.post("/apis", (req, res) => {
         res.sendStatus(500);
     });
 });
+router.post("/record/:switch", (req, res) => {
+    co(function* () {
+        let video = new Video();
+        let record_video = {};
+        if (req.params.switch === "start") {
+            record_video = yield video.startRecord(req.body.url);
+        } else if (req.params.switch === "stop") {
+            record_video = yield video.stopRecord(req.body.url, req.body.seconds);
+        }
+        res.json(record_video);
+    }).catch(err => {
+        console.error(err);
+        res.sendStatus(500);
+    });
+});
 module.exports = router;
