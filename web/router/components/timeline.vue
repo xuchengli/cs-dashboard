@@ -19,7 +19,12 @@
                         :time="time"></time-scale>
             <time-elapse :scale-ratio="ratio" :scale-unit="unit" :scale-pixel="scaleWidth"
                         :time="elapse"></time-elapse>
-            <div class="reference-axis"></div>
+            <div class="reference-axis uk-flex">
+                <icon class="video-record">
+                    <icon name="circle" scale="1.5" style="color: #fff;"></icon>
+                    <icon name="video-camera" scale=".75"></icon>
+                </icon>
+            </div>
         </div>
         <div class="time-scale-adjuster">
             <vue-slider width="100%" height="0" :dot-size="9" tooltip="hover"
@@ -32,6 +37,9 @@
     import TimeScale from "../../components/time-scale.vue";
     import TimeElapse from "../../components/time-elapse.vue";
     import vueSlider from "vue-slider-component";
+    import Icon from "vue-awesome/components/Icon.vue";
+    import "vue-awesome/icons/circle";
+    import "vue-awesome/icons/video-camera";
 
     export default {
         data() {
@@ -69,7 +77,8 @@
         components: {
             TimeScale,
             TimeElapse,
-            vueSlider
+            vueSlider,
+            Icon
         }
     }
 </script>
@@ -99,5 +108,11 @@
         height: 100%;
         left: 50%;
         margin-left: -1px;
+    }
+    .video-record {
+        cursor: pointer;
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-left: -11px;
     }
 </style>

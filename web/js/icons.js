@@ -205,7 +205,7 @@ export default {
             }
         ]
     },
-    circle: {
+    round: {
         width: 500,
         height: 500,
         paths: [
