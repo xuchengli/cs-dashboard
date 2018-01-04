@@ -149,7 +149,7 @@
                             geometryFunction: Draw.createRegularPolygon(3)
                         });
                         break;
-                    case "circle":
+                    case "round":
                         draw = new Draw({
                             source: this.vectorSource,
                             type: "Circle",
