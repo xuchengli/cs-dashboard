@@ -3,12 +3,16 @@
         "en": {
             "s": "Second",
             "m": "Minute",
-            "h": "Hour"
+            "h": "Hour",
+            "record": "Record",
+            "stop-record": "Stop Record"
         },
         "zh-CN": {
             "s": "秒",
             "m": "分钟",
-            "h": "小时"
+            "h": "小时",
+            "record": "录像",
+            "stop-record": "停止录像"
         }
     }
 </i18n>
@@ -20,10 +24,14 @@
             <time-elapse :scale-ratio="ratio" :scale-unit="unit" :scale-pixel="scaleWidth"
                         :time="elapse"></time-elapse>
             <div class="reference-axis uk-flex">
-                <icon class="video-record">
-                    <icon name="circle" scale="1.5" style="color: #fff;"></icon>
-                    <icon name="video-camera" scale=".75"></icon>
-                </icon>
+                <div class="video-record" uk-tooltip :title="tip" @click="recordVideo">
+                    <icon>
+                        <icon name="circle" scale="1.5" style="color: #fff;"></icon>
+                        <icon name="video-camera" scale=".75" v-show="!recording"></icon>
+                        <icon name="stop-circle-o" scale="1.4" style="color: #d65b5b;"
+                            v-show="recording"></icon>
+                    </icon>
+                </div>
             </div>
         </div>
         <div class="time-scale-adjuster">
@@ -40,6 +48,7 @@
     import Icon from "vue-awesome/components/Icon.vue";
     import "vue-awesome/icons/circle";
     import "vue-awesome/icons/video-camera";
+    import "vue-awesome/icons/stop-circle-o";
 
     export default {
         data() {
@@ -54,7 +63,8 @@
                     width: "6px",
                     height: "6px",
                     visibility: "visible"
-                }
+                },
+                recording: false
             }
         },
         computed: {
@@ -72,6 +82,14 @@
             },
             formatter() {
                 return this.ratio + " " + this.$t(this.unit);
+            },
+            tip() {
+                return this.recording ? this.$t("stop-record") : this.$t("record");
+            }
+        },
+        methods: {
+            recordVideo() {
+                this.recording = !this.recording;
             }
         },
         components: {
