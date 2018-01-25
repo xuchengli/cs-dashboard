@@ -145,5 +145,12 @@ class video {
             }, { baseURL: url + "/api" }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
+    addPoint(url, point){
+        return new Promise((resolve, reject) => {
+            axios.post("/points/", {
+                point
+            }, { baseURL: url + "/api" }).then(res => resolve(res.data)).catch(err => reject(err));
+        });
+    }
 }
 module.exports = video;

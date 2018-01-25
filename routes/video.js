@@ -171,4 +171,14 @@ router.post("/record/:switch", (req, res) => {
         res.sendStatus(500);
     });
 });
+router.post("/addPoint", (req, res) => {
+    co(function* () {
+        let video = new Video();
+        let response = yield video.addPoint(req.body.url, req.body.point);
+        res.json(response);
+    }).catch(err => {
+        console.error(err);
+        res.sendStatus(500);
+    });
+});
 module.exports = router;
