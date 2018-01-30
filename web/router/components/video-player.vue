@@ -50,13 +50,16 @@
     import Modify from "ol/interaction/modify";
     import Polygon from "ol/geom/polygon";
     import Transform from "../../js/ol/transform";
+    import Size from "ol/size";
+    import axios from "axios";
 
     export default {
-        props: ["src"],
+        props: ["src","stream_api"],
         data() {
             return {
                 loading: false,
                 canvasHeight: 0,
+                canvasWidth: 0,
                 player: null,
                 map: null,
                 center: [0, 0],
@@ -69,7 +72,7 @@
         },
         computed: {
             style() {
-                return { height: this.canvasHeight + "px" };
+                return { height: this.canvasHeight + "px" ,width : this.canvasWidth + "px"};
             },
             totalFeatures() {
                 return this.vectorSource ? this.vectorSource.getFeatures().length : 0;
@@ -88,6 +91,7 @@
             setTimeout(() => {
                 this.$nextTick(() => {
                     this.canvasHeight = this.$el.offsetHeight;
+                    this.canvasWidth = this.$el.offsetWidth;
                     this.$nextTick(() => { this.init(); });
                 });
             }, 100);
@@ -330,11 +334,10 @@
                                     this.player.renderer.y = this.dy;
                                     this.player.renderer.canvas.width = size[0];
                                     this.player.renderer.canvas.height = size[1];
-
                                     return this.player.renderer.canvas;
                                 },
                                 ratio: 1,
-                                resolutions: [1]
+                                resolutions: [0.67]
                             })
                         }),
                         new VectorLayer({
@@ -357,7 +360,8 @@
                         altShiftDragRotate: false,
                         keyboard: false,
                         shiftDragZoom: false,
-                        pinchRotate: false
+                        pinchRotate: false,
+                        doubleClickZoom: false
                     }),
                     logo: false,
                     view: new View({
@@ -368,6 +372,22 @@
                         center: [0, 0],
                         resolution: 1
                     })
+                });
+                //this.map.size = Size([1280,672]);
+                this.map.updateSize();
+                this.map.on('singleclick',(e) => {
+                    const size = this.map.getSize();
+                    const pixel = this.map.getEventPixel(e.pointerEvent);
+                    const point = {
+                        width : size[0],
+                        height : size[1],
+                        x : (pixel[0]),
+                        y : (pixel[1])
+                    };
+                    this.addPoint(point);
+                })
+                this.map.on('dblclick',function(e){
+                    // double click
                 });
             },
             createStar(coordinates, geometry, points) {
@@ -389,6 +409,16 @@
                 newCoordinates.push(newCoordinates[0].slice());
                 geometry.setCoordinates([newCoordinates]);
                 return geometry;
+            },
+            addPoint(point){
+                axios.post("video/addPoint", {
+                    url: this.stream_api,
+                    point
+                }).then(res => {
+                    console.log(res);
+                }).catch(err => {
+                    console.log(err);
+                });
             }
         },
         beforeRouteLeave(to, from, next) {

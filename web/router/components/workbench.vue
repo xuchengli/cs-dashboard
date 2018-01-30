@@ -49,7 +49,7 @@
                 </div>
                 <div class="uk-card uk-card-default uk-margin-left uk-width-expand">
                     <div class="uk-card-body uk-padding-remove video-player">
-                        <router-view name="video-player" :src="video.stream_address"></router-view>
+                        <router-view name="video-player" :src="video.stream_address" :stream_api="video.stream_api"></router-view>
                     </div>
                     <div class="uk-card-footer uk-padding-remove video-timeline">
                         <router-view name="timeline"></router-view>
@@ -108,7 +108,7 @@
         color: #666;
     }
     .video-player {
-        height: 90%;
+        height: 70%;
     }
     .video-timeline {
         height: 10%;
