@@ -10,9 +10,14 @@
             "upload-fail-msg": "Upload failed.",
             "read-stream-fail-msg": "Read video stream failed.",
             "confirm-msg": "Are you sure to delete the video?",
-            "prompt-msg": "Video stream URL: <p class='uk-text-meta uk-margin-small-bottom'>e.g., {example}</p>",
+            "prompt-msg": "Video stream URL: ",
+            "prompt-msg-eg": "e.g.",
             "cancel": "Cancel",
-            "ok": "Ok"
+            "ok": "Ok",
+            "add-video": "Add Video",
+            "select-plugin": "Please select a plugin.",
+            "select-upload-type": "Please select the way to upload.",
+            "upload-type": "Upload type"
         },
         "zh-CN": {
             "edit": "编辑",
@@ -24,9 +29,14 @@
             "upload-fail-msg": "上传失败！",
             "read-stream-fail-msg": "读取视频流失败！",
             "confirm-msg": "你确信要删除这个视频吗？",
-            "prompt-msg": "视频流地址：<p class='uk-text-meta uk-margin-small-bottom'>例如，{example}</p>",
+            "prompt-msg": "视频流地址：",
+            "prompt-msg-eg": "例如",
             "cancel": "取消",
-            "ok": "确定"
+            "ok": "确定",
+            "add-video": "添加视频",
+            "select-plugin": "请选择插件",
+            "select-upload-type": "请选择上传方式",
+            "upload-type": "上传方式"
         }
     }
 </i18n>
@@ -63,17 +73,60 @@
             <div class="uk-flex uk-flex-between uk-flex-middle
                 uk-padding-small uk-padding-remove-horizontal uk-padding-remove-top">
                 <div class="uk-margin-left">
-                    <div id="uploader" uk-form-custom>
-                        <input type="file" :disabled="uploading">
-                        <button class="uk-button uk-button-primary" type="button"
-                            tabindex="-1" :disabled="uploading">
-                            {{ $t("upload") }}
-                        </button>
+                    <button class="uk-button uk-button-primary" type="button" :disabled="uploading"
+                            uk-toggle="target: #select-id">{{ $t("add-video") }}</button>
+                </div>
+                <div id="select-id"  uk-modal="center: true">
+                    <div  class="uk-modal-dialog uk-modal-body">
+                        <button class="uk-modal-close-default" type="button" uk-close></button>
+                        <h2 class="uk-modal-title">{{ $t("add-video") }}</h2>
+                        <form class="uk-form-stacked uk-margin-large">
+
+                            <div class="uk-margin">
+                                <label class="uk-form-label" for="form-horizontal-select">{{ $t("select-plugin") }}</label>
+                                <div class="uk-form-controls">
+                                    <select class="uk-select" id="form-horizontal-select" v-model="pluginId">
+                                        <option v-for="p in plugins" :value="p.id">{{ p.name.en }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="uk-margin">
+                                <div class="uk-form-label">{{ $t("select-upload-type") }}</div>
+                                <div class="uk-form-controls uk-form-controls-text">
+                                    <label><input class="uk-radio" type="radio" name="radio1"
+                                                  v-model="selectRadio" value="upload"> {{ $t("upload") }}</label><br>
+                                    <label><input class="uk-radio" type="radio" name="radio1"
+                                                  v-model="selectRadio" value="open"> {{ $t("video-stream") }}</label>
+                                </div>
+                            </div>
+
+                            <div class="uk-margin" v-show="selectRadio === 'upload'">
+                                <label class="uk-form-label">{{ $t("upload-type") }}</label>
+                                <div class="uk-form-controls">
+                                    <div id="uploader" uk-form-custom  @click="hide">
+                                        <input type="file">
+                                        <button class="uk-button uk-button-primary" type="button"
+                                                tabindex="-1">
+                                            {{ $t("upload") }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="uk-margin" v-show="selectRadio === 'open'">
+                                <label class="uk-form-label">{{ $t("prompt-msg") }}</label>
+                                <div class="uk-form-controls">
+                                    <div class="uk-text-muted uk-text-small">{{ $t("prompt-msg-eg") }}: "rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov"</div>
+                                    <input class="uk-input" type="text"  v-model="openUrl">
+                                </div>
+                            </div>
+                            <p class="uk-text-right">
+                                <button class="uk-button uk-button-default uk-modal-close" type="button">{{ $t("cancel") }}</button>
+                                <button class="uk-button uk-button-primary" type="button" @click="openStream">{{ $t("ok") }}</button>
+                            </p>
+                        </form>
                     </div>
-                    <button class="uk-button uk-button-secondary uk-margin-small-left"
-                        type="button" :disabled="uploading" @click="openStream">
-                        {{ $t("video-stream") }}
-                    </button>
                 </div>
                 <ul class="uk-pagination uk-margin-remove-vertical uk-margin-right" v-if="totalPage > 1">
                     <li v-for="no of totalPage" :class="{ 'uk-active': no === pageNo }">
@@ -99,8 +152,20 @@
                 pageNo: 1,
                 uploading: false,
                 uploadedPercentage: 0,
-                timer: null
+                timer: null,
+                selectRadio: "",
+                openUrl: "",
+                pluginId: "",
+                plugins: []
             }
+        },
+        mounted() {
+            axios.get("video/plugins").then(res => {
+                this.plugins = res.data;
+                this.pluginId = res.data.length > 0 ? res.data[0].id : "";
+            }).catch(err => {
+                console.log(err);
+            });
         },
         computed: {
             totalRow() {
@@ -128,6 +193,7 @@
                 this.loading = true;
                 axios("video/list").then(res => {
                     this.loading = false;
+                    let pluginId = this.pluginId;
                     for (let video of res.data) {
                         this.videos.push({
                             id: video._id,
@@ -141,6 +207,7 @@
                             name: "video",
                             mime: "video/*",
                             dataType: "json",
+                            params: {pluginId: pluginId},
                             fail: e => {
                                 UIkit.notification(this.$t("invalid-mime-msg"), "warning");
                             },
@@ -197,41 +264,28 @@
                 }, () => {});
             },
             openStream() {
-                UIkit.modal.prompt(
-                    this.$t("prompt-msg", {
-                        example: "rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov"
-                    }),
-                    "",
-                    {
-                        labels: {
-                            ok: this.$t("ok"),
-                            cancel: this.$t("cancel")
+                if (this.openUrl) {
+                    this.uploading = true;
+                    this.uploadedPercentage = 0;
+                    this.trickProgress();
+                    axios.post("video/stream", { url: this.openUrl, pluginId: this.pluginId}).then(res => {
+                        this.uploading = false;
+                        this.uploadedPercentage = 100;
+                        if (res.status === 200) {
+                            this.videos.unshift({
+                                id: res.data._id,
+                                cover: "video/" + res.data._id + "/cover",
+                                overlay: false
+                            });
+                        } else {
+                            UIkit.notification(this.$t("read-stream-fail-msg"), "danger");
                         }
-                    }
-                ).then(url => {
-                    if (url) {
-                        this.uploading = true;
-                        this.uploadedPercentage = 0;
-                        this.trickProgress();
-                        axios.post("video/stream", { url: url }).then(res => {
-                            this.uploading = false;
-                            this.uploadedPercentage = 100;
-                            if (res.status === 200) {
-                                this.videos.unshift({
-                                    id: res.data._id,
-                                    cover: "video/" + res.data._id + "/cover",
-                                    overlay: false
-                                });
-                            } else {
-                                UIkit.notification(this.$t("read-stream-fail-msg"), "danger");
-                            }
-                        }).catch(err => {
-                            this.uploading = false;
-                            this.uploadedPercentage = 100;
-                            UIkit.notification(this.$t("global.error.500"), "danger");
-                        });
-                    }
-                });
+                    }).catch(err => {
+                        this.uploading = false;
+                        this.uploadedPercentage = 100;
+                        UIkit.notification(this.$t("global.error.500"), "danger");
+                    });
+                }
             },
             trickProgress() {
                 if (this.uploadedPercentage < 90) {
@@ -245,6 +299,10 @@
                         this.trickProgress();
                     }, this.uploadedPercentage * Math.round(50 * Math.random()));
                 }
+            },
+            hide() {
+                let select = UIkit.modal("#select-id");
+                select.hide();
             }
         },
         components: {

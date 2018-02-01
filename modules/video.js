@@ -76,10 +76,11 @@ class video {
             );
         });
     }
-    createStream(src) {
+    createStream(src, pluginId) {
         return new Promise((resolve, reject) => {
             axios.post("/streams/", {
-                source: src
+                source: src,
+                plugin_class_name: pluginId
             }, {
                 baseURL: config.Video_Stream_API
             }).then(res => resolve(res.data)).catch(err => reject(err));
@@ -150,6 +151,13 @@ class video {
             axios.post("/points/", {
                 point
             }, { baseURL: url + "/api" }).then(res => resolve(res.data)).catch(err => reject(err));
+        });
+    }
+    listPlugins(){
+        return new Promise((resolve, reject) => {
+            axios.get("/plugins/", {
+                baseURL: config.Video_Stream_API
+            }).then(res => resolve(res.data)).catch(err => reject(err));
         });
     }
 }
