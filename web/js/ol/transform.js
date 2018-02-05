@@ -215,7 +215,7 @@ class Transform extends Pointer {
                         if (prow[1] !== anchor[1]) sy = 1 - deltaY / (anchor[1] - prow[1]);
                         geometries.forEach(geometry => { geometry.scale(sx, sy, anchor); });
                         break;
-                    case this._rotateHandle.feature:
+                    case this._rotateHandle.feature: {
                         let lastAngle = Math.atan2(
                             this._lastCoordinate[1] - this._sketchCentre[1],
                             this._lastCoordinate[0] - this._sketchCentre[0]
@@ -235,6 +235,7 @@ class Transform extends Pointer {
                         this._deleteImage.setRotation(
                             this._deleteImage.getRotation() - deltaAngle);
                         break;
+                    }
                 }
             }
             this._lastCoordinate = newCoordinate;
