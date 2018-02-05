@@ -1,4 +1,4 @@
-# cs-dashboard
+# cs-dashboard [![Build Status](https://travis.ibm.com/video-insight/dashboard.svg?token=KSEM2FzxEaamyesmheNz&branch=master)](https://travis.ibm.com/video-insight/dashboard (https://travis.ibm.com/video-insight/dashboard.svg?token=KSEM2FzxEaamyesmheNz&branch=master%29]%28https://travis.ibm.com/video-insight/dashboard) )
 It is cognitive solution dashboard
 
 ## Installation
