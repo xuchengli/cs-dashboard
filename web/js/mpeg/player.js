@@ -19,7 +19,7 @@ class player {
         this.video.connect(this.renderer);
 
         let _unpauseOnShow = false;
-        document.addEventListener("visibilitychange", evt => {
+        document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "hidden") {
                 _unpauseOnShow = this.wantsToPlay;
                 this.pause();
@@ -70,11 +70,11 @@ class player {
         if (!this.source.established) {
             this.renderer.renderProgress(this.source.progress);
             this.renderer.canvas.dispatchEvent(this.progressEvent);
-        	return;
+            return;
         }
         if (!this.isPlaying) {
             this.isPlaying = true;
-        	this.startTime = JSMpeg.Now() - this.currentTime;
+            this.startTime = JSMpeg.Now() - this.currentTime;
             this.renderer.renderProgress(this.source.progress);
             this.renderer.canvas.dispatchEvent(this.progressEvent);
         }
