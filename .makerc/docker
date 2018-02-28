@@ -1,0 +1,22 @@
+REGION?=crl.ptopenlab.com:8777
+NAMESPACE?=video-insight
+ifeq ($(DEV), True)
+	VERSION?=dev
+else
+	VERSION?=latest
+endif
+
+SERVER_IMAGE?=$(REGION)/$(NAMESPACE)/cs-dashboard:$(VERSION)
+MONGO_IMAGE:=mongo
+SERVER_DOCKER_FILE:=Dockerfile
+NODE_IMAGE:=node
+
+ifeq ($(ARCH), ppc64le)
+	MONGO_IMAGE:=ppc64le/mongodb:2.6.10
+	SERVER_DOCKER_FILE:=Dockerfile.ppc64le
+	NODE_IMAGE:=ppc64le/node:7.10
+endif
+
+export SERVER_IMAGE
+export MONGO_IMAGE
+export SERVER_DOCKER_FILE

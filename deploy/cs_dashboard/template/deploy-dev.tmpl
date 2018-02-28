@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cs-dashboard
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cs-dashboard
+    spec:
+      containers:
+      - name: mongo
+        image: ${MONGO_IMAGE}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: mongo
+          mountPath: "/data/db"
+      - name: dashboard
+        image: ${SERVER_IMAGE}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: cs-dashboard-config
+        volumeMounts:
+        - name: code
+          mountPath: "/usr/app/src"
+        - name: video-store
+          mountPath: "/data"
+        command:
+          - npm
+          - run
+          - dev
+      volumes:
+      - name: mongo
+        hostPath:
+          path: ${MONGO_DB_PATH}
+      - name: code
+        hostPath:
+          path: ${SERVER_CODE_PATH}
+      - name: video-store
+        hostPath:
+          path: ${VIDEO_STORE_PATH}

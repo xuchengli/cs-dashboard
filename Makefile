@@ -1,7 +1,27 @@
+export ARCH = $(shell arch)
+export DEV?=True
+
 -include .makerc/help
+-include .makerc/docker
+-include .makerc/deploy
 
 check: ##@Code check code
 	@npm run lint
+
+build-images: ##@Docker build images
+	@docker build -t ${SERVER_IMAGE} -f ${SERVER_DOCKER_FILE} .
+
+push-images: ##@Docker push images
+	@docker push ${SERVER_IMAGE}
+
+start:
+	@$(MAKE) -C deploy/ start
+
+stop:
+	@$(MAKE) -C deploy/ stop
+
+npm-install: ##@Dev install node packages for dev env
+	@docker run -v ${PWD}:/app ${NODE_IMAGE} bash -c "cd /app && npm install"
 
 HELP_FUN = \
 	%help; \

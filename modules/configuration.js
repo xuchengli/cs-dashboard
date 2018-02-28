@@ -8,6 +8,7 @@ module.exports = {
         uri: process.env.MongoDB_URI || "mongodb://localhost:27017/cognitive_solution"
     },
     Context_Path: process.env.Context_Path || "/cs",
+    VIDEO_STORE_PATH: process.env.VIDEO_STORE_PATH || "/data",
     AI_VISION: {
         api: process.env.AI_VISION_API || "http://9.186.106.206:9080/powerai-vision/api",
         admin: {
