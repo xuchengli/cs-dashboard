@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cs-dashboard-config
+  namespace: ${K8S_DEPLOY_NAMESPACE}
+data:
+  AI_VISION_API: ${AI_VISION_API}
+  Video_Stream_API: ${VIDEO_STREAM_API}
+  MongoDB_URI: mongodb://${MONGO_DB_HOST}:27017/cognitive_solution
+  Context_Path: ${WEBROOT}
+  VIDEO_STORE_PATH: /data

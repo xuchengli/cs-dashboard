@@ -1,0 +1,41 @@
+DEPLOY_METHOD?=k8s
+K8S_DEPLOY_NAMESPACE?=video-insight-dashboard
+
+MONGO_DB_PATH?=${PWD}/data/mongo
+SERVER_CODE_PATH:=${PWD}
+VIDEO_STORE_PATH?=${PWD}/data/video
+IMAGE_PULL_SECRET?=
+MONGO_DB_HOST:=dashboard_mongo
+WEBROOT?=/cs-dashboard
+
+ifeq ($(DEV), True)
+	ifeq ($(IMAGE_PULL_SECRET), )
+		DEPLOY_TEMPLATE:=deploy-dev.tmpl
+	else
+		DEPLOY_TEMPLATE:=deploy-dev-private.tmpl
+	endif
+else
+	ifeq ($(IMAGE_PULL_SECRET), )
+		DEPLOY_TEMPLATE:=deploy.tmpl
+	else
+		DEPLOY_TEMPLATE:=deploy-private.tmpl
+	endif
+endif
+
+ifeq ($(DEPLOY_METHOD), k8s)
+	MONGO_DB_HOST:=localhost
+endif
+
+AI_VISION_API?=http://9.186.106.206:9080/powerai-vision/api
+VIDEO_STREAM_API?=http://9.186.106.206/video-insight/api
+
+export SERVER_CODE_PATH
+export MONGO_DB_PATH
+export IMAGE_PULL_SECRET
+export DEPLOY_TEMPLATE
+export AI_VISION_API
+export VIDEO_STREAM_API
+export MONGO_DB_HOST
+export WEBROOT
+export K8S_DEPLOY_NAMESPACE
+export VIDEO_STORE_PATH

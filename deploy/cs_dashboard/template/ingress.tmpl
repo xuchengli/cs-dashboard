@@ -1,0 +1,12 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: cs-dashboard-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: ${WEBROOT}
+        backend:
+          serviceName: cs-dashboard-service
+          servicePort: 8080
