@@ -8,7 +8,7 @@ services:
     container_name: cs-dashboard
     environment:
       - AI_VISION_API=${AI_VISION_API:-http://9.186.106.206:9080/powerai-vision/api}
-      - Video_Stream_API=${Video_Stream_API:-http://9.186.106.206:8085/video-insight/api}
+      - Video_Stream_API=${Video_Stream_API:-http://9.186.106.206/video-insight/api}
       - MongoDB_URI=${MongoDB_URI:-mongodb://dashboard_mongo:27017/cognitive_solution}
     volumes:
       - ./:/usr/app/src
