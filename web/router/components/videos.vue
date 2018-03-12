@@ -76,8 +76,8 @@
                     <button class="uk-button uk-button-primary" type="button" :disabled="uploading"
                             uk-toggle="target: #select-id">{{ $t("add-video") }}</button>
                 </div>
-                <div id="select-id"  uk-modal="center: true">
-                    <div  class="uk-modal-dialog uk-modal-body">
+                <div id="select-id" uk-modal="center: true">
+                    <div class="uk-modal-dialog uk-modal-body">
                         <button class="uk-modal-close-default" type="button" uk-close></button>
                         <h2 class="uk-modal-title">{{ $t("add-video") }}</h2>
                         <form class="uk-form-stacked uk-margin-large">
@@ -157,15 +157,7 @@
                 openUrl: "",
                 pluginId: "",
                 plugins: []
-            }
-        },
-        mounted() {
-            axios.get("video/plugins").then(res => {
-                this.plugins = res.data;
-                this.pluginId = res.data.length > 0 ? res.data[0].id : "";
-            }).catch(err => {
-                console.log(err);
-            });
+            };
         },
         computed: {
             totalRow() {
@@ -183,67 +175,82 @@
             }
         },
         created() {
-            this.getVideos();
+            this.load();
         },
         watch: {
-            "$route": "getVideos"
+            "$route": "load"
         },
         methods: {
+            getPlugins() {
+                return new Promise((resolve, reject) => {
+                    axios.get("video/plugins").then(res => {
+                        resolve(res.data);
+                    }).catch(err => {
+                        reject(err);
+                    });
+                });
+            },
             getVideos() {
+                return new Promise((resolve, reject) => {
+                    axios("video/list").then(res => {
+                        resolve(res.data);
+                    }).catch(err => {
+                        reject(err);
+                    });
+                });
+            },
+            async load() {
                 this.loading = true;
-                axios("video/list").then(res => {
-                    this.loading = false;
-                    let pluginId = this.pluginId;
-                    for (let video of res.data) {
-                        this.videos.push({
-                            id: video._id,
-                            cover: "video/" + video._id + "/cover",
-                            overlay: false
-                        });
-                    }
-                    this.$nextTick(() => {
-                        UIkit.upload("#uploader", {
-                            url: "video/upload",
-                            name: "video",
-                            mime: "video/*",
-                            dataType: "json",
-                            params: {pluginId: pluginId},
-                            fail: e => {
-                                UIkit.notification(this.$t("invalid-mime-msg"), "warning");
-                            },
-                            loadStart: e => {
-                                this.uploading = true;
-                                this.uploadedPercentage = 0;
-                            },
-                            progress: e => {
-                                if (e.loaded && e.total) {
-                                    this.uploadedPercentage = e.loaded / e.total * 100;
-                                }
-                            },
-                            completeAll: e => {
-                                this.uploading = false;
-                                this.uploadedPercentage = 100;
-                                if (e.status === 200) {
-                                    let response = JSON.parse(e.responseText);
-                                    this.videos.unshift({
-                                        id: response._id,
-                                        cover: "video/" + response._id + "/cover",
-                                        overlay: false
-                                    });
-                                } else {
-                                    UIkit.notification(this.$t("upload-fail-msg"), "danger");
-                                }
-                            },
-                            error: e => {
-                                this.uploading = false;
-                                this.uploadedPercentage = 100;
+                let videos = await this.getVideos();
+                for (let video of videos) {
+                    this.videos.push({
+                        id: video._id,
+                        cover: "video/" + video._id + "/cover",
+                        overlay: false
+                    });
+                }
+                this.plugins = await this.getPlugins();
+                this.pluginId = this.plugins.length ? this.plugins[0].id : "";
+                this.loading = false;
+                this.$nextTick(() => {
+                    UIkit.upload("#uploader", {
+                        url: "video/upload",
+                        name: "video",
+                        mime: "video/*",
+                        dataType: "json",
+                        params: { pluginId: this.pluginId },
+                        fail: () => {
+                            UIkit.notification(this.$t("invalid-mime-msg"), "warning");
+                        },
+                        loadStart: () => {
+                            this.uploading = true;
+                            this.uploadedPercentage = 0;
+                        },
+                        progress: e => {
+                            if (e.loaded && e.total) {
+                                this.uploadedPercentage = e.loaded / e.total * 100;
+                            }
+                        },
+                        completeAll: e => {
+                            this.uploading = false;
+                            this.uploadedPercentage = 100;
+                            if (e.status === 200) {
+                                let response = JSON.parse(e.responseText);
+                                this.videos.unshift({
+                                    id: response._id,
+                                    cover: "video/" + response._id + "/cover",
+                                    overlay: false
+                                });
+                            } else {
                                 UIkit.notification(this.$t("upload-fail-msg"), "danger");
                             }
-                        });
+                        },
+                        error: () => {
+                            this.uploading = false;
+                            this.uploadedPercentage = 100;
+                            UIkit.notification(this.$t("upload-fail-msg"), "danger");
+                        }
                     });
-                }).catch(err => {
-                    this.loading = false;
-                    UIkit.notification(this.$t("global.error.500"), "danger");
                 });
             },
             edit(id) {
@@ -256,9 +263,9 @@
                         cancel: this.$t("cancel")
                     }
                 }).then(() => {
-                    axios.delete("video/" + id).then(res => {
+                    axios.delete("video/" + id).then(() => {
                         this.videos.splice(this.videos.findIndex(video => video.id === id), 1);
-                    }).catch(err => {
+                    }).catch(() => {
                         UIkit.notification(this.$t("global.error.500"), "danger");
                     });
                 }, () => {});
@@ -280,7 +287,7 @@
                         } else {
                             UIkit.notification(this.$t("read-stream-fail-msg"), "danger");
                         }
-                    }).catch(err => {
+                    }).catch(() => {
                         this.uploading = false;
                         this.uploadedPercentage = 100;
                         UIkit.notification(this.$t("global.error.500"), "danger");
@@ -308,7 +315,7 @@
         components: {
             TopProgress
         }
-    }
+    };
 </script>
 <style scoped>
     .video {
