@@ -21,6 +21,7 @@ const upload = multer({ storage: storage }).single("video");
 router.post("/upload", upload, (req, res) => {
     co(function* () {
         let video = new Video();
+        let pluginId = req.body.pluginId;
         let originalname = req.file.originalname;
         let destination = req.file.destination;
         let filename = req.file.filename;
@@ -38,7 +39,7 @@ router.post("/upload", upload, (req, res) => {
         //创建视频流
         let videoSrc = req.protocol + "://" + req.get("host") +
                     config.Context_Path + "/api/video/" + saved._id;
-        let videoStream = yield video.createStream(videoSrc);
+        let videoStream = yield video.createStream(videoSrc, pluginId);
         let integratedVideo = yield video.setStream(saved._id, videoStream);
         res.json(integratedVideo);
     }).catch(err => {
@@ -50,29 +51,41 @@ router.post("/stream", (req, res) => {
     co(function* () {
         let video = new Video();
         let file = {};
-        let fileurl = req.body.url;
-        let filename = fileurl.substring(fileurl.lastIndexOf("/") + 1);
-        let cover = (filename.substring(0, filename.lastIndexOf(".")) || filename) + ".png";
+        let fileUrl = req.body.url;
+        let pluginId = req.body.pluginId;
+        let fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+        let cover = (fileName.substring(0, fileName.lastIndexOf(".")) || fileName) + ".png";
         let destination = path.join(uploadDir, dateFormat(new Date(), "yyyymmddHHMMss.l"));
         fs.ensureDirSync(destination);
 
         Object.assign(file, {
             source_type: "stream",
-            originalname: fileurl,
+            originalname: fileUrl,
             destination: destination,
-            filename: filename
+            filename: fileName
         });
         let output = path.join(destination, cover);
-        let slice = yield video.screenShot(fileurl, output, 1);
+        let slice = yield video.screenShot(fileUrl, output, 1);
         if (slice) {
             Object.assign(file, { cover: cover });
         }
         let userInfo = JSON.parse(req.cookies[config.cookieName]);
         let saved = yield video.save(userInfo.apikey, file);
         //创建视频流
-        let videoStream = yield video.createStream(fileurl);
+        let videoStream = yield video.createStream(fileUrl,pluginId);
         let integratedVideo = yield video.setStream(saved._id, videoStream);
         res.json(integratedVideo);
+    }).catch(err => {
+        console.error(err);
+        res.sendStatus(500);
+    });
+});
+
+router.get("/plugins",(req, res) => {
+    co(function* () {
+        let video = new Video();
+        let response = yield video.listPlugins();
+        res.json(response);
     }).catch(err => {
         console.error(err);
         res.sendStatus(500);
